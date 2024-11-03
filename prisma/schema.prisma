@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(cuid())
+  email    String  @unique
+  name     String
+  password String
+  isAdmin  Boolean @map("is_admin")
+
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  Domain      Domain[]
+  Pages       Page[]
+  Translation Translation[]
+
+  @@map("users")
+}
+
+model Domain {
+  id String @id @default(cuid())
+
+  domainName      String    @unique @map("domain_name")
+  platform        Platform?
+  sourceLanguage  String    @map("source_language")
+  targetLanguages String[]  @default([]) @map("target_languages")
+  wordsCount      Int?      @default(0) @map("words_count")
+  isPublished     Boolean   @default(true) @map("is_published")
+  isActivated     Boolean   @default(false) @map("is_activated")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user        User          @relation(fields: [userId], references: [id])
+  userId      String        @map("user_id")
+  Pages       Page[]
+  Translation Translation[]
+
+  @@index([userId, domainName])
+  @@map("domains")
+}
+
+model Page {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  domain   Domain @relation(fields: [domainId], references: [id])
+  domainId String @map("domain_id")
+
+  pageUrl     String        @map("page_url")
+  wordsCount  Int           @default(0) @map("words_count")
+  isExcluded  Boolean       @default(false) @map("is_excluded")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  Translation Translation[]
+
+  @@index([userId, domainId])
+  @@map("pages")
+}
+
+model Translation {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  domain   Domain @relation(fields: [domainId], references: [id])
+  domainId String @map("domain_id")
+
+  page   Page   @relation(fields: [pageId], references: [id])
+  pageId String @map("page_id")
+
+  sourceText     String @map("source_text")
+  translatedText String @map("translated_text")
+  targetLanguage String @map("target_language")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([domainId])
+  @@index([pageId, targetLanguage])
+  @@map("translations")
+}
+
+enum Platform {
+  Wordpress
+  Joomla
+  SquareSpace
+  Shopify
+  Other
+}
