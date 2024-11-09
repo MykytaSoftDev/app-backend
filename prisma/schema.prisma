@@ -14,8 +14,8 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  email    String  @unique
+  id       String   @id @default(cuid())
+  email    String   @unique
   name     String
   password String
   isAdmin  Boolean? @default(false) @map("is_admin")
@@ -61,12 +61,13 @@ model Page {
   domain   Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
   domainId String @map("domain_id")
 
-  pageUrl     String        @map("page_url")
-  wordsCount  Int           @default(0) @map("words_count")
-  isExcluded  Boolean       @default(false) @map("is_excluded")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  Translation Translation[]
+  pageUrl        String        @map("page_url")
+  targetLanguage String        @map("target_language")
+  wordsCount     Int           @default(0) @map("words_count")
+  isExcluded     Boolean       @default(false) @map("is_excluded")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  Translation    Translation[]
 
   @@index([userId, domainId])
   @@map("pages")
