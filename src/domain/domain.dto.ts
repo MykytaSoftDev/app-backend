@@ -1,0 +1,27 @@
+import { Platform } from '@prisma/client'
+import {
+	ArrayNotEmpty,
+	IsArray,
+	IsEnum,
+	IsOptional,
+	IsString,
+} from 'class-validator'
+
+export class DomainDto {
+	@IsString()
+	domainName: string
+
+	@IsEnum(Platform)
+	@IsOptional()
+	platform: Platform
+
+	@IsString()
+	@IsOptional()
+	sourceLanguage: string
+
+	@IsArray()
+	@ArrayNotEmpty()
+	@IsString({ each: true })
+	@IsOptional()
+	targetLanguages: string[]
+}

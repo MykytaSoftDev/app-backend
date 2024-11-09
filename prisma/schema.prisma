@@ -43,7 +43,7 @@ model Domain {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user        User          @relation(fields: [userId], references: [id])
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String        @map("user_id")
   Pages       Page[]
   Translation Translation[]
@@ -55,10 +55,10 @@ model Domain {
 model Page {
   id String @id @default(cuid())
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @map("user_id")
 
-  domain   Domain @relation(fields: [domainId], references: [id])
+  domain   Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
   domainId String @map("domain_id")
 
   pageUrl     String        @map("page_url")
@@ -75,13 +75,13 @@ model Page {
 model Translation {
   id String @id @default(cuid())
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @map("user_id")
 
-  domain   Domain @relation(fields: [domainId], references: [id])
+  domain   Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
   domainId String @map("domain_id")
 
-  page   Page   @relation(fields: [pageId], references: [id])
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   pageId String @map("page_id")
 
   sourceText     String @map("source_text")
@@ -98,9 +98,9 @@ model Translation {
 }
 
 enum Platform {
-  Wordpress
-  Joomla
-  SquareSpace
-  Shopify
-  Other
+  wordpress
+  joomla
+  squarespace
+  shopify
+  other
 }
