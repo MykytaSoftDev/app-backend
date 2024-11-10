@@ -85,8 +85,10 @@ model Translation {
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   pageId String @map("page_id")
 
+  sourceHash     String @unique @map("source_hash") @db.VarChar(64)
   sourceText     String @map("source_text")
   translatedText String @map("translated_text")
+  sourceLanguage String @map("source_language")
   targetLanguage String @map("target_language")
 
   createdAt DateTime @default(now()) @map("created_at")

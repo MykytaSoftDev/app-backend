@@ -1,4 +1,4 @@
-import { IsString, IsOptional } from 'class-validator'
+import { IsNumber, IsOptional, IsString } from 'class-validator'
 
 export class PageDto {
 	@IsString()
@@ -8,4 +8,8 @@ export class PageDto {
 	@IsString()
 	@IsOptional()
 	targetLanguage: string
+
+	@IsNumber()
+	@IsOptional()
+	wordsCount?: number
 }

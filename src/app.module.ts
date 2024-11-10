@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from './auth/auth.module'
 import { DomainModule } from './domain/domain.module'
 import { PageModule } from './page/page.module'
+import { TranslationModule } from './translation/translation.module'
 import { UserModule } from './user/user.module'
 
 @Module({
@@ -12,6 +13,7 @@ import { UserModule } from './user/user.module'
 		UserModule,
 		DomainModule,
 		PageModule,
+		TranslationModule,
 	],
 })
 export class AppModule {}
