@@ -20,7 +20,7 @@ export class UserDto {
 
 	@IsString()
 	@IsOptional()
-	name: string
+	name?: string
 
 	@IsBoolean()
 	@IsOptional()

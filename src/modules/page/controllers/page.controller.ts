@@ -7,8 +7,8 @@ import {
 	UsePipes,
 	ValidationPipe,
 } from '@nestjs/common'
-import { Auth } from 'src/auth/decorators/auth.decorator'
-import { CurrentUser } from 'src/auth/decorators/user.decorator'
+import { Auth } from 'src/modules/auth/decorators/auth.decorator'
+import { CurrentUser } from 'src/modules/auth/decorators/user.decorator'
 import { PageService } from '../page.service'
 
 @Controller('user/project/:projectId/pages')

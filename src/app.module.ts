@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { AuthModule } from './auth/auth.module'
-import { PageModule } from './page/page.module'
-import { ProjectModule } from './project/project.module'
-import { TranslationModule } from './translation/translation.module'
-import { UserModule } from './user/user.module'
-import { WidgetModule } from './widget/widget.module'
+import { AuthModule } from './modules/auth/auth.module'
+import { PageModule } from './modules/page/page.module'
+import { ProjectModule } from './modules/project/project.module'
+import { TranslationModule } from './modules/translation/translation.module'
+import { UserModule } from './modules/user/user.module'
+import { WidgetModule } from './modules/widget/widget.module'
 
 @Module({
 	imports: [

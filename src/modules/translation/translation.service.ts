@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { createHash } from 'crypto'
 import * as _ from 'lodash/string'
-import { PageService } from 'src/page/page.service'
+import { PageService } from 'src/modules/page/page.service'
 import { PrismaService } from 'src/prisma.service'
-import { DeeplService } from 'src/services/deepl.service'
+import { DeeplService } from 'src/services/translation.services/deepl.service'
 import { TranslationDto } from './translation.dto'
 
 @Injectable()

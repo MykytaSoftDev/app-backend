@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
+import { SettingsService } from '../settings/settings.service'
 import { ProjectDto } from './project.dto'
 
 @Injectable()
 export class ProjectService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private projectSettingsService: SettingsService,
+	) {}
 
 	async create(dto: ProjectDto, userId: string) {
-		return this.prisma.project.create({
+		const project = await this.prisma.project.create({
 			data: {
 				...dto,
 				user: {
@@ -17,6 +21,8 @@ export class ProjectService {
 				},
 			},
 		})
+		const projectSettings = await this.projectSettingsService.create(project.id)
+		return { project, projectSettings }
 	}
 
 	async update(dto: Partial<ProjectDto>, projectId: string, userId: string) {

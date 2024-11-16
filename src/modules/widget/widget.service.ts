@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { PageService } from 'src/page/page.service'
-import { ProjectService } from 'src/project/project.service'
+import { PageService } from 'src/modules/page/page.service'
+import { ProjectService } from 'src/modules/project/project.service'
+import { SettingsService } from 'src/modules/settings/settings.service'
+import { UserService } from 'src/modules/user/user.service'
 import { LanguageService } from 'src/services/language.service'
-import { UserService } from 'src/user/user.service'
 
 @Injectable()
 export class WidgetService {
@@ -11,6 +12,7 @@ export class WidgetService {
 		private userService: UserService,
 		private projectService: ProjectService,
 		private pageService: PageService,
+		private projectSettingsService: SettingsService,
 	) {}
 
 	async getWidgetConfigs(apiKey: string, referrer: string) {
@@ -24,6 +26,7 @@ export class WidgetService {
 			userId,
 			domainName,
 		)
+		console.log(id, project)
 		const { isExcluded } = await this.pageService.isExcluded(
 			userId,
 			id,
@@ -38,7 +41,8 @@ export class WidgetService {
 			project.sourceLanguage,
 		)
 
-		// const projectSettings =
+		const projectSettings =
+			await this.projectSettingsService.getProjectSettings(id)
 
 		return {
 			sourceLanguage: sourceLanguage,
@@ -47,7 +51,7 @@ export class WidgetService {
 			targetLanguages: targetLanguagesDetails,
 			isPublished: project.isPublished,
 			isExcluded: isExcluded,
-			settings: {},
+			settings: projectSettings,
 		}
 	}
 

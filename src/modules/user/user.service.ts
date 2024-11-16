@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { hash } from 'argon2'
 import { randomBytes } from 'crypto'
-import { AuthDto } from 'src/auth/dto/auth.dto'
+import { AuthDto } from 'src/modules/auth/dto/auth.dto'
 import { PrismaService } from 'src/prisma.service'
 import { UserDto } from './user.dto'
 
@@ -63,7 +63,7 @@ export class UserService {
 
 	private async generateApiKey() {
 		const prefix = process.env.KEY_PREFIX
-		const apiKey = `${prefix}_${randomBytes(32).toString('hex')}`
+		const apiKey = `${prefix}_${randomBytes(16).toString('hex')}`
 		return apiKey
 	}
 }
