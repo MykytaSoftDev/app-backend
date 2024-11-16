@@ -17,7 +17,7 @@ export class TranslationService {
 	async create(
 		dto: TranslationDto,
 		userId: string,
-		domainId: string,
+		projectId: string,
 		pageId: string,
 	) {
 		return this.prisma.translation.create({
@@ -28,9 +28,9 @@ export class TranslationService {
 						id: userId,
 					},
 				},
-				domain: {
+				project: {
 					connect: {
-						id: domainId,
+						id: projectId,
 					},
 				},
 				page: {
@@ -45,48 +45,44 @@ export class TranslationService {
 	async translate(
 		dto: TranslationDto,
 		userId: string,
-		domainId: string,
+		projectId: string,
 		pageId: string,
 	) {
-		const { segments, ...data } = dto;
+		const { segments, ...data } = dto
 
 		// Calculate words count for all segments
-		const wordsCount = segments.reduce((count, el) => count + _.words(el).length, 0);
+		const wordsCount = segments.reduce(
+			(count, el) => count + _.words(el).length,
+			0,
+		)
 
 		// Translate all segments in parallel
-		const translationPromises = segments.map(async (segment) => {
+		const translationPromises = segments.map(async segment => {
 			const translatedText = await this.deeplService.translate(
 				segment,
 				dto.sourceLanguage,
 				dto.targetLanguage,
-			);
+			)
 
 			return {
 				...data,
 				sourceText: segment,
 				translatedText,
 				sourceHash: createHash('sha256').update(segment).digest('hex'),
-			};
-		});
+			}
+		})
 
 		// Wait for all translations to complete
-		const translations = await Promise.all(translationPromises);
+		const translations = await Promise.all(translationPromises)
 
 		// Batch save translations to reduce database writes
 		await Promise.all(
-			translations.map((translation) =>
-				this.create(translation, userId, domainId, pageId),
+			translations.map(translation =>
+				this.create(translation, userId, projectId, pageId),
 			),
-		);
+		)
 
 		// Update the words count for the page
-		await this.pageService.update(
-			{ wordsCount },
-			pageId,
-			userId,
-			domainId,
-		);
+		await this.pageService.update({ wordsCount }, pageId, userId, projectId)
 	}
-
-
 }

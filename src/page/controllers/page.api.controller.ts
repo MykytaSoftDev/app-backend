@@ -13,7 +13,7 @@ import {
 import { PageDto } from '../page.dto'
 import { PageService } from '../page.service'
 
-@Controller('user/:userId/domains/:domainId/pages')
+@Controller('user/:userId/domains/:projectId/pages')
 export class PageApiController {
 	constructor(private readonly pageService: PageService) {}
 
@@ -23,9 +23,9 @@ export class PageApiController {
 	async create(
 		@Body() dto: PageDto,
 		@Param('userId') userId: string,
-		@Param('domainId') domainId: string,
+		@Param('projectId') projectId: string,
 	) {
-		return this.pageService.create(dto, userId, domainId)
+		return this.pageService.create(dto, userId, projectId)
 	}
 
 	@Put(':id')
@@ -35,9 +35,9 @@ export class PageApiController {
 		@Body() dto: PageDto,
 		@Param('id') pageId: string,
 		@Param('userId') userId: string,
-		@Param('domainId') domainId: string,
+		@Param('projectId') projectId: string,
 	) {
-		return this.pageService.update(dto, pageId, userId, domainId)
+		return this.pageService.update(dto, pageId, userId, projectId)
 	}
 
 	@Delete(':id')
@@ -46,18 +46,18 @@ export class PageApiController {
 	async delete(
 		@Param('id') pageId: string,
 		@Param('userId') userId: string,
-		@Param('domainId') domainId: string,
+		@Param('projectId') projectId: string,
 	) {
-		return this.pageService.delete(pageId, userId, domainId)
+		return this.pageService.delete(pageId, userId, projectId)
 	}
 
 	@Get()
 	@HttpCode(200)
 	async getAll(
 		@Param('userId') userId: string,
-		@Param('domainId') domainId: string,
+		@Param('projectId') projectId: string,
 	) {
-		return this.pageService.getAll(userId, domainId)
+		return this.pageService.getAll(userId, projectId)
 	}
 
 	@Get(':id')
@@ -65,8 +65,8 @@ export class PageApiController {
 	async getDomainById(
 		@Param('id') pageId: string,
 		@Param('userId') userId: string,
-		@Param('domainId') domainId: string,
+		@Param('projectId') projectId: string,
 	) {
-		return this.pageService.getPageById(pageId, domainId, userId)
+		return this.pageService.getPageById(pageId, projectId, userId)
 	}
 }

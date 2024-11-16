@@ -7,7 +7,7 @@ import {
 	IsString,
 } from 'class-validator'
 
-export class DomainDto {
+export class ProjectDto {
 	@IsString()
 	domainName: string
 

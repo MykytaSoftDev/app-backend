@@ -12,19 +12,19 @@ import {
 } from '@nestjs/common'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
-import { DomainDto } from './domain.dto'
-import { DomainService } from './domain.service'
+import { ProjectDto } from './project.dto'
+import { ProjectService } from './project.service'
 
 @Controller('user/domains')
-export class DomainController {
-	constructor(private readonly domainService: DomainService) {}
+export class ProjectController {
+	constructor(private readonly projectService: ProjectService) {}
 
 	@Post()
 	@Auth()
 	@HttpCode(200)
 	@UsePipes(new ValidationPipe())
-	async create(@Body() dto: DomainDto, @CurrentUser('id') userId: string) {
-		return this.domainService.create(dto, userId)
+	async create(@Body() dto: ProjectDto, @CurrentUser('id') userId: string) {
+		return this.projectService.create(dto, userId)
 	}
 
 	@Put(':id')
@@ -32,11 +32,11 @@ export class DomainController {
 	@HttpCode(200)
 	@UsePipes(new ValidationPipe())
 	async update(
-		@Body() dto: DomainDto,
+		@Body() dto: ProjectDto,
 		@CurrentUser('id') userId: string,
-		@Param('id') domainId: string,
+		@Param('id') projectId: string,
 	) {
-		return this.domainService.update(dto, domainId, userId)
+		return this.projectService.update(dto, projectId, userId)
 	}
 
 	@Delete(':id')
@@ -45,22 +45,22 @@ export class DomainController {
 	@UsePipes(new ValidationPipe())
 	async delete(
 		@CurrentUser('id') userId: string,
-		@Param('id') domainId: string,
+		@Param('id') projectId: string,
 	) {
-		return this.domainService.delete(domainId, userId)
+		return this.projectService.delete(projectId, userId)
 	}
 
 	@Get()
 	@Auth()
 	@HttpCode(200)
 	async getAll(@CurrentUser('id') userId: string) {
-		return this.domainService.getAll(userId)
+		return this.projectService.getAll(userId)
 	}
 
 	@Get(':id')
 	@Auth()
 	@HttpCode(200)
-	async getDomainById(@Param('id') domainId: string) {
-		return this.domainService.getDomainById(domainId)
+	async getDomainById(@Param('id') projectId: string) {
+		return this.projectService.getDomainById(projectId)
 	}
 }

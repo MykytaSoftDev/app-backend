@@ -23,18 +23,19 @@ model User {
 
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
-  Domain      Domain[]
   Pages       Page[]
   Translation Translation[]
+  Project     Project[]
 
   @@index([email, apiKey])
   @@map("users")
 }
 
-model Domain {
+model Project {
   id String @id @default(cuid())
 
   domainName      String    @map("domain_name")
+  projectName     String    @default("My Website") @map("project_name")
   platform        Platform?
   sourceLanguage  String    @map("source_language")
   targetLanguages String[]  @default([]) @map("target_languages")
@@ -45,14 +46,15 @@ model Domain {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String        @map("user_id")
-  Pages       Page[]
-  Translation Translation[]
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String            @map("user_id")
+  Pages           Page[]
+  Translation     Translation[]
+  ProjectSettings ProjectSettings[]
 
   @@unique([userId, domainName])
   @@index([userId, domainName])
-  @@map("domains")
+  @@map("projects")
 }
 
 model Page {
@@ -61,8 +63,8 @@ model Page {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @map("user_id")
 
-  domain   Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  domainId String @map("domain_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @map("project_id")
 
   pageUrl        String        @map("page_url")
   targetLanguage String        @map("target_language")
@@ -72,7 +74,7 @@ model Page {
   updatedAt      DateTime      @updatedAt @map("updated_at")
   Translation    Translation[]
 
-  @@index([userId, domainId])
+  @@index([userId, projectId])
   @@map("pages")
 }
 
@@ -82,8 +84,8 @@ model Translation {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @map("user_id")
 
-  domain   Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  domainId String @map("domain_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @map("project_id")
 
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   pageId String @map("page_id")
@@ -98,7 +100,7 @@ model Translation {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([userId])
-  @@index([domainId])
+  @@index([projectId])
   @@index([pageId, targetLanguage])
   @@map("translations")
 }
@@ -116,6 +118,23 @@ model Language {
   @@map("languages")
 }
 
+model ProjectSettings {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @map("project_id")
+
+  flags    Boolean     @default(true)
+  flagType StyleRadius @default(circle) @map("flag_type")
+
+  title         Boolean      @default(true)
+  widgetStyle   String       @default("dropdown") @map("widget_style")
+  widgetCorners StyleRadius  @default(rectangle) @map("widget_corners")
+  UrlStructure  UrlStructure @default(default) @map("url_structure")
+
+  @@index([projectId])
+  @@map("project_settings")
+}
+
 enum Platform {
   wordpress
   joomla
@@ -127,4 +146,16 @@ enum Platform {
 enum Support {
   google
   deepl
+}
+
+enum StyleRadius {
+  rectangle
+  square
+  circle
+}
+
+enum UrlStructure {
+  default
+  subdomain
+  subdirectory
 }

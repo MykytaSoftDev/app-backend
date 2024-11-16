@@ -6,7 +6,7 @@ import { PageDto } from './page.dto'
 export class PageService {
 	constructor(private prisma: PrismaService) {}
 
-	async create(dto: PageDto, userId: string, domainId: string) {
+	async create(dto: PageDto, userId: string, projectId: string) {
 		return this.prisma.page.create({
 			data: {
 				...dto,
@@ -15,9 +15,9 @@ export class PageService {
 						id: userId,
 					},
 				},
-				domain: {
+				project: {
 					connect: {
-						id: domainId,
+						id: projectId,
 					},
 				},
 			},
@@ -28,69 +28,69 @@ export class PageService {
 		dto: Partial<PageDto>,
 		pageId: string,
 		userId: string,
-		domainId: string,
+		projectId: string,
 	) {
 		return this.prisma.page.update({
 			where: {
 				id: pageId,
 				userId: userId,
-				domainId: domainId,
+				projectId: projectId,
 			},
 			data: dto,
 		})
 	}
 
-	async delete(pageId: string, userId: string, domainId: string) {
+	async delete(pageId: string, userId: string, projectId: string) {
 		return this.prisma.page.delete({
 			where: {
 				id: pageId,
 				userId: userId,
-				domainId: domainId,
+				projectId: projectId,
 			},
 		})
 	}
 
-	async getAll(userId: string, domainId: string) {
+	async getAll(userId: string, projectId: string) {
 		return this.prisma.page.findMany({
 			where: {
 				userId: userId,
-				domainId: domainId,
+				projectId: projectId,
 			},
 		})
 	}
 
 	async getAllWithLanguage(
 		userId: string,
-		domainId: string,
+		projectId: string,
 		targetLanguage: string,
 	) {
 		return this.prisma.page.findMany({
 			where: {
 				userId: userId,
-				domainId: domainId,
+				projectId: projectId,
 				targetLanguage: targetLanguage,
 			},
 		})
 	}
 
-	async getPageById(pageId: string, domainId: string, userId: string) {
+	async getPageById(pageId: string, projectId: string, userId: string) {
 		return this.prisma.page.findFirstOrThrow({
 			where: {
 				id: pageId,
-				domainId: domainId,
+				projectId: projectId,
 				userId: userId,
 			},
 		})
 	}
 
-	async isExcluded(userId: string, domainId: string, pageUrl: string) {
+	async isExcluded(userId: string, projectId: string, pageUrl: string) {
 		return this.prisma.page.findFirst({
 			select: {
 				isExcluded: true,
 			},
 			where: {
 				userId: userId,
-				domainId: domainId,
+				projectId: projectId,
 				pageUrl: pageUrl,
 			},
 		})

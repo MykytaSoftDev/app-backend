@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
-import { DomainDto } from './domain.dto'
+import { ProjectDto } from './project.dto'
 
 @Injectable()
-export class DomainService {
+export class ProjectService {
 	constructor(private prisma: PrismaService) {}
 
-	async create(dto: DomainDto, userId: string) {
-		return this.prisma.domain.create({
+	async create(dto: ProjectDto, userId: string) {
+		return this.prisma.project.create({
 			data: {
 				...dto,
 				user: {
@@ -19,43 +19,43 @@ export class DomainService {
 		})
 	}
 
-	async update(dto: Partial<DomainDto>, domainId: string, userId: string) {
-		return this.prisma.domain.update({
+	async update(dto: Partial<ProjectDto>, projectId: string, userId: string) {
+		return this.prisma.project.update({
 			where: {
 				userId: userId,
-				id: domainId,
+				id: projectId,
 			},
 			data: dto,
 		})
 	}
 
-	async delete(domainId: string, userId: string) {
-		return this.prisma.domain.delete({
+	async delete(projectId: string, userId: string) {
+		return this.prisma.project.delete({
 			where: {
 				userId: userId,
-				id: domainId,
+				id: projectId,
 			},
 		})
 	}
 
 	async getAll(userId: string) {
-		return this.prisma.domain.findMany({
+		return this.prisma.project.findMany({
 			where: {
 				userId: userId,
 			},
 		})
 	}
 
-	async getDomainById(domainId: string) {
-		return this.prisma.domain.findUnique({
+	async getDomainById(projectId: string) {
+		return this.prisma.project.findUnique({
 			where: {
-				id: domainId,
+				id: projectId,
 			},
 		})
 	}
 
 	async getDomainByDomainName(userId: string, domainName: string) {
-		return this.prisma.domain.findFirst({
+		return this.prisma.project.findFirst({
 			select: {
 				id: true,
 				sourceLanguage: true,

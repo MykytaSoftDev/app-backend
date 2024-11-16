@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { DomainService } from 'src/domain/domain.service'
 import { PageService } from 'src/page/page.service'
+import { ProjectService } from 'src/project/project.service'
 import { LanguageService } from 'src/services/language.service'
 import { UserService } from 'src/user/user.service'
 
@@ -9,7 +9,7 @@ export class WidgetService {
 	constructor(
 		private languageService: LanguageService,
 		private userService: UserService,
-		private domainService: DomainService,
+		private projectService: ProjectService,
 		private pageService: PageService,
 	) {}
 
@@ -20,7 +20,7 @@ export class WidgetService {
 		const { hostname: domainName, pathname: pagePath } = new URL(
 			await this.decodeFromBase64(referrer),
 		)
-		const { id, ...domain } = await this.domainService.getDomainByDomainName(
+		const { id, ...domain } = await this.projectService.getDomainByDomainName(
 			userId,
 			domainName,
 		)
