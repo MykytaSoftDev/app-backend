@@ -12,7 +12,7 @@ export class WidgetService {
 		private userService: UserService,
 		private projectService: ProjectService,
 		private pageService: PageService,
-		private projectSettingsService: SettingsService,
+		private settingsService: SettingsService,
 	) {}
 
 	async getWidgetConfigs(apiKey: string, referrer: string) {
@@ -22,17 +22,15 @@ export class WidgetService {
 		const { hostname: domainName, pathname: pagePath } = new URL(
 			await this.decodeFromBase64(referrer),
 		)
-		const { id, ...project } = await this.projectService.getProjectByDomainName(
+		const project = await this.projectService.getProjectByDomainName(
 			userId,
 			domainName,
 		)
-		console.log(id, project)
 		const { isExcluded } = await this.pageService.isExcluded(
 			userId,
-			id,
+			project.id,
 			pagePath,
 		)
-
 		const targetLanguagesDetails =
 			await this.languageService.getTargetLanguagesDetails(
 				project.targetLanguages,
@@ -41,8 +39,9 @@ export class WidgetService {
 			project.sourceLanguage,
 		)
 
-		const projectSettings =
-			await this.projectSettingsService.getProjectSettings(id)
+		const projectSettings = await this.settingsService.getProjectSettings(
+			project.id,
+		)
 
 		return {
 			sourceLanguage: sourceLanguage,
