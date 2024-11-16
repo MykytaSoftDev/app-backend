@@ -20,7 +20,7 @@ export class WidgetService {
 		const { hostname: domainName, pathname: pagePath } = new URL(
 			await this.decodeFromBase64(referrer),
 		)
-		const { id, ...domain } = await this.projectService.getDomainByDomainName(
+		const { id, ...project } = await this.projectService.getProjectByDomainName(
 			userId,
 			domainName,
 		)
@@ -32,18 +32,20 @@ export class WidgetService {
 
 		const targetLanguagesDetails =
 			await this.languageService.getTargetLanguagesDetails(
-				domain.targetLanguages,
+				project.targetLanguages,
 			)
 		const sourceLanguage = await this.languageService.getObjectByCode2(
-			domain.sourceLanguage,
+			project.sourceLanguage,
 		)
+
+		// const projectSettings =
 
 		return {
 			sourceLanguage: sourceLanguage,
-			sourceLanguageCode: domain.sourceLanguage,
-			targetLanguagesCodes: domain.targetLanguages,
+			sourceLanguageCode: project.sourceLanguage,
+			targetLanguagesCodes: project.targetLanguages,
 			targetLanguages: targetLanguagesDetails,
-			isPublished: domain.isPublished,
+			isPublished: project.isPublished,
 			isExcluded: isExcluded,
 			settings: {},
 		}

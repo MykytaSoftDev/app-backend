@@ -13,7 +13,7 @@ import {
 import { PageDto } from '../page.dto'
 import { PageService } from '../page.service'
 
-@Controller('user/:userId/domains/:projectId/pages')
+@Controller('user/:userId/project/:projectId/pages')
 export class PageApiController {
 	constructor(private readonly pageService: PageService) {}
 
@@ -62,7 +62,7 @@ export class PageApiController {
 
 	@Get(':id')
 	@HttpCode(200)
-	async getDomainById(
+	async getPageById(
 		@Param('id') pageId: string,
 		@Param('userId') userId: string,
 		@Param('projectId') projectId: string,

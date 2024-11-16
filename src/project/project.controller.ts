@@ -15,7 +15,7 @@ import { CurrentUser } from 'src/auth/decorators/user.decorator'
 import { ProjectDto } from './project.dto'
 import { ProjectService } from './project.service'
 
-@Controller('user/domains')
+@Controller('user/projects')
 export class ProjectController {
 	constructor(private readonly projectService: ProjectService) {}
 
@@ -60,7 +60,7 @@ export class ProjectController {
 	@Get(':id')
 	@Auth()
 	@HttpCode(200)
-	async getDomainById(@Param('id') projectId: string) {
-		return this.projectService.getDomainById(projectId)
+	async getProjectById(@Param('id') projectId: string) {
+		return this.projectService.getProjectById(projectId)
 	}
 }

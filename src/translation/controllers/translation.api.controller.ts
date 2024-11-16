@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, Param, Post } from '@nestjs/common'
 import { TranslationDto } from '../translation.dto'
 import { TranslationService } from '../translation.service'
 
-@Controller('user/:userId/domains/:projectId/pages/:pageId/translations')
+@Controller('user/:userId/project/:projectId/pages/:pageId/translations')
 export class TranslationApiController {
 	constructor(private translationService: TranslationService) {}
 
@@ -23,6 +23,11 @@ export class TranslationApiController {
 		@Param('projectId') projectId: string,
 		@Param('pageId') pageId: string,
 	) {
-		return await this.translationService.translate(dto, userId, projectId, pageId)
+		return await this.translationService.translate(
+			dto,
+			userId,
+			projectId,
+			pageId,
+		)
 	}
 }

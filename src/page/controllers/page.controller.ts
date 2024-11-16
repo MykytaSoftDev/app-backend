@@ -11,7 +11,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator'
 import { CurrentUser } from 'src/auth/decorators/user.decorator'
 import { PageService } from '../page.service'
 
-@Controller('user/domains/:projectId/pages')
+@Controller('user/project/:projectId/pages')
 export class PageController {
 	constructor(private readonly pageService: PageService) {}
 

@@ -46,7 +46,7 @@ export class ProjectService {
 		})
 	}
 
-	async getDomainById(projectId: string) {
+	async getProjectById(projectId: string) {
 		return this.prisma.project.findUnique({
 			where: {
 				id: projectId,
@@ -54,7 +54,7 @@ export class ProjectService {
 		})
 	}
 
-	async getDomainByDomainName(userId: string, domainName: string) {
+	async getProjectByDomainName(userId: string, domainName: string) {
 		return this.prisma.project.findFirst({
 			select: {
 				id: true,
