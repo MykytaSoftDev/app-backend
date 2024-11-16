@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { hash } from 'argon2'
+import { randomBytes } from 'crypto'
 import { AuthDto } from 'src/auth/dto/auth.dto'
 import { PrismaService } from 'src/prisma.service'
 import { UserDto } from './user.dto'
@@ -13,6 +14,7 @@ export class UserService {
 			email: dto.email,
 			name: dto.name,
 			password: await hash(dto.password),
+			apiKey: await this.generateApiKey(),
 		}
 
 		return this.prisma.user.create({
@@ -49,5 +51,19 @@ export class UserService {
 				email,
 			},
 		})
+	}
+
+	async getUserByApiKey(apiKey: string) {
+		return this.prisma.user.findFirst({
+			where: {
+				apiKey: apiKey,
+			},
+		})
+	}
+
+	private async generateApiKey() {
+		const prefix = process.env.KEY_PREFIX
+		const apiKey = `${prefix}_${randomBytes(32).toString('hex')}`
+		return apiKey
 	}
 }

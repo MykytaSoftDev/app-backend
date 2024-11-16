@@ -82,4 +82,17 @@ export class PageService {
 			},
 		})
 	}
+
+	async isExcluded(userId: string, domainId: string, pageUrl: string) {
+		return this.prisma.page.findFirst({
+			select: {
+				isExcluded: true,
+			},
+			where: {
+				userId: userId,
+				domainId: domainId,
+				pageUrl: pageUrl,
+			},
+		})
+	}
 }

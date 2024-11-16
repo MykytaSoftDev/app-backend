@@ -5,6 +5,7 @@ import { DomainModule } from './domain/domain.module'
 import { PageModule } from './page/page.module'
 import { TranslationModule } from './translation/translation.module'
 import { UserModule } from './user/user.module'
+import { WidgetModule } from './widget/widget.module'
 
 @Module({
 	imports: [
@@ -14,6 +15,7 @@ import { UserModule } from './user/user.module'
 		DomainModule,
 		PageModule,
 		TranslationModule,
+		WidgetModule,
 	],
 })
 export class AppModule {}

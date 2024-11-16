@@ -25,4 +25,8 @@ export class UserDto {
 	@IsBoolean()
 	@IsOptional()
 	isAdmin: boolean
+
+	@IsString()
+	@IsOptional()
+	apiKey: string
 }

@@ -54,9 +54,16 @@ export class DomainService {
 		})
 	}
 
-	async getDomainByName(domainName: string) {
-		return this.prisma.domain.findUnique({
+	async getDomainByDomainName(userId: string, domainName: string) {
+		return this.prisma.domain.findFirst({
+			select: {
+				id: true,
+				sourceLanguage: true,
+				targetLanguages: true,
+				isPublished: true,
+			},
 			where: {
+				userId: userId,
 				domainName: domainName,
 			},
 		})

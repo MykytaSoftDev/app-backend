@@ -18,6 +18,7 @@ model User {
   email    String   @unique
   name     String
   password String
+  apiKey   String   @unique @map("api_key")
   isAdmin  Boolean? @default(false) @map("is_admin")
 
   createdAt   DateTime      @default(now()) @map("created_at")
@@ -26,13 +27,14 @@ model User {
   Pages       Page[]
   Translation Translation[]
 
+  @@index([email, apiKey])
   @@map("users")
 }
 
 model Domain {
   id String @id @default(cuid())
 
-  domainName      String    @unique @map("domain_name")
+  domainName      String    @map("domain_name")
   platform        Platform?
   sourceLanguage  String    @map("source_language")
   targetLanguages String[]  @default([]) @map("target_languages")
@@ -48,6 +50,7 @@ model Domain {
   Pages       Page[]
   Translation Translation[]
 
+  @@unique([userId, domainName])
   @@index([userId, domainName])
   @@map("domains")
 }
@@ -100,10 +103,28 @@ model Translation {
   @@map("translations")
 }
 
+model Language {
+  id            Int     @id @default(autoincrement())
+  title         String  @unique
+  titleNative   String  @unique @map("title_native")
+  code2         String  @unique
+  code3         String  @unique
+  isRightToLeft Boolean @map("is_right_to_left")
+  support       Support
+
+  @@index([id, code2])
+  @@map("languages")
+}
+
 enum Platform {
   wordpress
   joomla
   squarespace
   shopify
   other
+}
+
+enum Support {
+  google
+  deepl
 }
