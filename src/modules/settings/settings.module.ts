@@ -8,4 +8,4 @@ import { SettingsService } from './settings.service'
 	providers: [PrismaService, SettingsService],
 	exports: [SettingsService],
 })
-export class WidgetModule {}
+export class SettingsModule {}

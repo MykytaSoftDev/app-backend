@@ -3,6 +3,7 @@ import {
 	ArrayNotEmpty,
 	IsArray,
 	IsEnum,
+	IsNumber,
 	IsOptional,
 	IsString,
 } from 'class-validator'
@@ -24,4 +25,8 @@ export class ProjectDto {
 	@IsString({ each: true })
 	@IsOptional()
 	targetLanguages: string[]
+
+	@IsNumber()
+	@IsOptional()
+	wordsCount: number
 }

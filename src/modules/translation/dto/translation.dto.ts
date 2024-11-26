@@ -20,9 +20,4 @@ export class TranslationDto {
 	@IsString()
 	@IsOptional()
 	translatedText: string
-
-	@IsOptional()
-	@IsArray()
-	@IsString({ each: true })
-	segments?: string[]
 }

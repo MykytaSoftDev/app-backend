@@ -1,33 +1,26 @@
-import { Body, Controller, HttpCode, Param, Post } from '@nestjs/common'
-import { TranslationDto } from '../translation.dto'
+import {
+	Body,
+	Controller,
+	HttpCode,
+	Param,
+	Post,
+	UsePipes,
+	ValidationPipe,
+} from '@nestjs/common'
+import { TranslationApiDto } from '../dto/translation.api.dto'
 import { TranslationService } from '../translation.service'
 
-@Controller('user/:userId/project/:projectId/pages/:pageId/translations')
+@Controller('project/:projectId/translate')
 export class TranslationApiController {
 	constructor(private translationService: TranslationService) {}
 
-	async create(
-		@Body() dto: TranslationDto,
-		@Param('userId') userId: string,
-		@Param('projectId') projectId: string,
-		@Param('pageId') pageId: string,
-	) {
-		return this.translationService.create(dto, userId, projectId, pageId)
-	}
-
 	@Post()
 	@HttpCode(200)
+	@UsePipes(new ValidationPipe())
 	async translate(
-		@Body() dto: TranslationDto,
-		@Param('userId') userId: string,
+		@Body() dto: TranslationApiDto,
 		@Param('projectId') projectId: string,
-		@Param('pageId') pageId: string,
 	) {
-		return await this.translationService.translate(
-			dto,
-			userId,
-			projectId,
-			pageId,
-		)
+		return await this.translationService.translate(dto, projectId)
 	}
 }

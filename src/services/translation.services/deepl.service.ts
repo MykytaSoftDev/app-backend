@@ -1,5 +1,7 @@
+import { Injectable } from '@nestjs/common'
 import { SourceLanguageCode, TargetLanguageCode, Translator } from 'deepl-node'
 
+@Injectable()
 export class DeeplService {
 	translator: Translator
 

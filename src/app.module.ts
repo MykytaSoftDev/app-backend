@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from './modules/auth/auth.module'
 import { PageModule } from './modules/page/page.module'
 import { ProjectModule } from './modules/project/project.module'
+import { SettingsModule } from './modules/settings/settings.module'
 import { TranslationModule } from './modules/translation/translation.module'
 import { UserModule } from './modules/user/user.module'
 import { WidgetModule } from './modules/widget/widget.module'
@@ -16,6 +17,7 @@ import { WidgetModule } from './modules/widget/widget.module'
 		PageModule,
 		TranslationModule,
 		WidgetModule,
+		SettingsModule,
 	],
 })
 export class AppModule {}

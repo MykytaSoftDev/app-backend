@@ -26,11 +26,15 @@ export class WidgetService {
 			userId,
 			domainName,
 		)
+
+		if (!project) return { error: 'Project does not exist' }
+
 		const { isExcluded } = await this.pageService.isExcluded(
 			userId,
 			project.id,
 			pagePath,
 		)
+
 		const targetLanguagesDetails =
 			await this.languageService.getTargetLanguagesDetails(
 				project.targetLanguages,
@@ -38,7 +42,6 @@ export class WidgetService {
 		const sourceLanguage = await this.languageService.getObjectByCode2(
 			project.sourceLanguage,
 		)
-
 		const projectSettings = await this.settingsService.getProjectSettings(
 			project.id,
 		)

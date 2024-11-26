@@ -111,6 +111,7 @@ model Language {
   titleNative   String  @unique @map("title_native")
   code2         String  @unique
   code3         String  @unique
+  flag          String  @default("")
   isRightToLeft Boolean @map("is_right_to_left")
   support       Support
 
@@ -129,7 +130,7 @@ model ProjectSettings {
   title         Boolean      @default(true)
   widgetStyle   String       @default("dropdown") @map("widget_style")
   widgetCorners StyleRadius  @default(rectangle) @map("widget_corners")
-  UrlStructure  UrlStructure @default(default) @map("url_structure")
+  urlStructure  UrlStructure @default(default) @map("url_structure")
 
   @@index([projectId])
   @@map("project_settings")

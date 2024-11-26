@@ -7,6 +7,17 @@ export class PageService {
 	constructor(private prisma: PrismaService) {}
 
 	async create(dto: PageDto, userId: string, projectId: string) {
+		// Проверяем, существуют ли пользователь и проект
+		const userExists = await this.prisma.user.findUnique({
+			where: { id: userId },
+		})
+		if (!userExists) throw new Error(`User with ID ${userId} not found.`)
+
+		const projectExists = await this.prisma.project.findUnique({
+			where: { id: projectId },
+		})
+		if (!projectExists)
+			throw new Error(`Project with ID ${projectId} not found.`)
 		return this.prisma.page.create({
 			data: {
 				...dto,
@@ -95,5 +106,23 @@ export class PageService {
 			},
 		})
 		return page ? page : { isExcluded: false }
+	}
+
+	async getPageByPath(
+		userId: string,
+		projectId: string,
+		pageUrl: string,
+		targetLanguage: string,
+	) {
+		const page = await this.prisma.page.findFirst({
+			where: {
+				userId: userId,
+				projectId: projectId,
+				pageUrl: pageUrl,
+				targetLanguage: targetLanguage,
+			},
+		})
+
+		return page
 	}
 }
