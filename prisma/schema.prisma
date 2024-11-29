@@ -90,7 +90,7 @@ model Translation {
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
   pageId String @map("page_id")
 
-  sourceHash     String @unique @map("source_hash") @db.VarChar(64)
+  sourceHash     String @map("source_hash") @db.VarChar(64)
   sourceText     String @map("source_text")
   translatedText String @map("translated_text")
   sourceLanguage String @map("source_language")
@@ -102,6 +102,7 @@ model Translation {
   @@index([userId])
   @@index([projectId])
   @@index([pageId, targetLanguage])
+  @@unique([sourceHash, pageId])
   @@map("translations")
 }
 

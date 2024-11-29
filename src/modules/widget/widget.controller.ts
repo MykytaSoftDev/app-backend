@@ -11,6 +11,7 @@ export class WidgetController {
 		@Query('apiKey') apiKey: string,
 		@Query('referrer') referrer: string,
 	) {
+		
 		return await this.widgetService.getWidgetConfigs(apiKey, referrer)
 	}
 }
