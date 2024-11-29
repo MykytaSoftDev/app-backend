@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { ProjectService } from 'src/modules/project/project.service'
 import { PrismaService } from 'src/prisma.service'
 import * as _ from 'lodash/string'
+import { PageService } from 'src/modules/page/page.service'
 
 @Injectable()
 export class WordCounterService {
 	constructor(
 		private prisma: PrismaService,
 		private projectService: ProjectService,
+		private pageService: PageService,
 	) {}
 
 	async recountProjectWords(userId: string, projectId: string) {
@@ -37,5 +39,23 @@ export class WordCounterService {
 		)
 
 		return wordsCount
+	}
+
+	async updateWordsCount(
+		segments: string[],
+		userId: string,
+		projectId: string,
+		pageId: string,
+	) {
+		const wordsCount = await this.calculateWords(segments)
+
+		await this.pageService.update(
+			{ wordsCount: wordsCount },
+			pageId,
+			userId,
+			projectId,
+		)
+
+		await this.recountProjectWords(userId, projectId)
 	}
 }
