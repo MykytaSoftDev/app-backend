@@ -93,14 +93,8 @@ export class TranslationService {
 				project.id,
 				page.id,
 			)
-			const result = [...translatedSegments, ...newTranslations].map(
-				translation => ({
-					sourceText: translation.sourceText,
-					translatedText: translation.translatedText,
-				}),
-			)
 
-			return result
+			return newTranslations
 		}
 
 		return translatedSegments
@@ -284,6 +278,7 @@ export class TranslationService {
 				translatedText: translation.translatedText,
 				sourceHash: translation.sourceHash,
 			})),
+			skipDuplicates: true,
 		})
 
 		await this.wordCounterService.updateWordsCount(

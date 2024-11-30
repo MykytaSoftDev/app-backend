@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common'
-import { SourceLanguageCode, TargetLanguageCode, Translator } from 'deepl-node'
+import {
+	SourceLanguageCode,
+	TargetLanguageCode,
+	TagHandlingMode,
+	Translator,
+} from 'deepl-node'
 
 @Injectable()
 export class DeeplService {
@@ -14,12 +19,16 @@ export class DeeplService {
 		sourceLanguage: string,
 		targetLanguage: string,
 	) {
+		const options = {
+			tagHandling: 'html' as TagHandlingMode,
+		}
+
 		const result = await this.translator.translateText(
 			segment,
 			sourceLanguage as SourceLanguageCode,
 			targetLanguage as TargetLanguageCode,
+			options,
 		)
-		console.log(result)
 		return result.text
 	}
 

@@ -23,8 +23,6 @@ export class WordCounterService {
 			},
 		})
 
-		console.log(`Total Word Count: ${totalWordCount._sum.wordsCount || 0}`)
-
 		await this.projectService.update(
 			{ wordsCount: totalWordCount._sum.wordsCount },
 			projectId,
@@ -33,10 +31,13 @@ export class WordCounterService {
 	}
 
 	async calculateWords(segments: string[]) {
-		const wordsCount = segments.reduce(
-			(count, el) => count + _.words(el).length,
-			0,
-		)
+		const wordsCount = segments.reduce((count, el) => {
+			// Remove HTML tags
+			const cleanedSegment = el.replace(/<\/?[^>]+(>|$)/g, '')
+			const wordCountInSegment = _.words(cleanedSegment).length
+
+			return count + wordCountInSegment
+		}, 0)
 
 		return wordsCount
 	}
