@@ -7,7 +7,7 @@ export class PageService {
 	constructor(private prisma: PrismaService) {}
 
 	async create(dto: PageDto, userId: string, projectId: string) {
-		// Проверяем, существуют ли пользователь и проект
+
 		const userExists = await this.prisma.user.findUnique({
 			where: { id: userId },
 		})

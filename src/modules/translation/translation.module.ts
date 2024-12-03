@@ -9,6 +9,7 @@ import { UserService } from '../user/user.service'
 import { TranslationApiController } from './controllers/translation.api.controller'
 import { TranslationController } from './controllers/translation.controller'
 import { TranslationService } from './translation.service'
+import { GoogleService } from 'src/services/translation.services/google.service'
 
 @Module({
 	controllers: [TranslationController, TranslationApiController],
@@ -21,6 +22,7 @@ import { TranslationService } from './translation.service'
 		ProjectService,
 		SettingsService,
 		UserService,
+		GoogleService,
 	],
 	exports: [TranslationService],
 })

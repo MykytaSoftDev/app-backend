@@ -33,10 +33,20 @@ export class DeeplService {
 	}
 
 	async getSourceLanguages() {
-		return this.translator.getSourceLanguages()
+		return (await this.translator.getSourceLanguages()).map(
+			language => language.code,
+		)
 	}
 
 	async getTargetLanguages() {
-		return this.translator.getTargetLanguages()
+		const targetLanguagesCodes = (
+			await this.translator.getTargetLanguages()
+		).map(language => language.code)
+
+		// Remove suffixes
+		const cleanedCodes = targetLanguagesCodes.map(code => code.split('-')[0])
+		const uniqueCodes = [...new Set(cleanedCodes)]
+
+		return uniqueCodes
 	}
 }

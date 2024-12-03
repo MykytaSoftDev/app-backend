@@ -9,12 +9,15 @@ import { UserService } from '../user/user.service'
 import { TranslationApiDto } from './dto/translation.api.dto'
 import { TranslationDto } from './dto/translation.dto'
 import { decodeFromBase64 } from '../../helpers/dev.helper'
+import { GoogleService } from 'src/services/translation.services/google.service'
+import { LanguageCode } from 'deepl-node'
 
 @Injectable()
 export class TranslationService {
 	constructor(
 		private prisma: PrismaService,
 		private deeplService: DeeplService,
+		private googleService: GoogleService,
 		private pageService: PageService,
 		private projectService: ProjectService,
 		private wordCounterService: WordCounterService,
@@ -132,6 +135,11 @@ export class TranslationService {
 			dto.segments,
 		)
 
+		const supportedTranslationService = await this.getSupportedService(
+			dto.sourceLanguageCode,
+			dto.targetLanguageCode,
+		)
+
 		const newPage = await this.pageService.create(
 			{
 				pageUrl: pagePath,
@@ -145,7 +153,12 @@ export class TranslationService {
 		// Translating segments
 		const translationTasks = dto.segments.map(async segment => {
 			try {
-				const translatedText = await this.deeplService.translate(
+				const translationService =
+					supportedTranslationService === 'deepl'
+						? this.deeplService
+						: this.googleService
+
+				const translatedText = await translationService.translate(
 					segment,
 					dto.sourceLanguageCode,
 					dto.targetLanguageCode,
@@ -240,10 +253,20 @@ export class TranslationService {
 			}))
 		}
 
+		const supportedTranslationService = await this.getSupportedService(
+			sourceLanguageCode,
+			targetLanguageCode,
+		)
+
 		// New segments translation
 		const translationTasks = newSegments.map(async segment => {
 			try {
-				const translatedText = await this.deeplService.translate(
+				const translationService =
+					supportedTranslationService === 'deepl'
+						? this.deeplService
+						: this.googleService
+
+				const translatedText = await translationService.translate(
 					segment.text,
 					sourceLanguageCode,
 					targetLanguageCode,
@@ -298,6 +321,20 @@ export class TranslationService {
 				})),
 			...newTranslations,
 		]
+	}
+
+	async getSupportedService(
+		sourceLanguageCode: string,
+		targetLanguageCode: string,
+	) {
+		const supportedLanguages = await this.deeplService.getSourceLanguages()
+		const supportedTargetLanguages =
+			await this.deeplService.getTargetLanguages()
+
+		return supportedLanguages.includes(sourceLanguageCode as LanguageCode) &&
+			supportedTargetLanguages.includes(targetLanguageCode)
+			? 'deepl'
+			: 'google'
 	}
 
 	async createSourceHash(segment: string) {
