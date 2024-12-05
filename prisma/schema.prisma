@@ -21,6 +21,10 @@ model User {
   apiKey   String   @unique @map("api_key")
   isAdmin  Boolean? @default(false) @map("is_admin")
 
+  plan      Plan   @relation(fields: [planId], references: [id])
+  planId    Int    @map("plan_id") @default(1)
+  planAlias String @default("free")
+
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
   Pages       Page[]
@@ -135,6 +139,27 @@ model ProjectSettings {
 
   @@index([projectId])
   @@map("project_settings")
+}
+
+model Plan {
+  id        Int    @id @default(autoincrement())
+  planName  String @map("plan_name")
+  planAlias String @map("plan_alias")
+
+  wordsLimit     Int @map("words_limit")
+  languagesLimit Int @map("languages_limit")
+  projectsLimit  Int @map("projects_limit")
+
+  monthlyPrice Float @map("monthly_price")
+  yearlyPrice  Float @map("yearly_price")
+
+  monthlyPaddleId Int @map("monthly_paddle_id")
+  yearlyPaddleId  Int @map("yearly_paddle_id")
+
+  User User[]
+
+  @@index([id, planAlias])
+  @@map("plans")
 }
 
 enum Platform {
