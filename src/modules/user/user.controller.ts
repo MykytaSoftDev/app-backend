@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Get,
 	HttpCode,
 	Put,
 	UsePipes,
@@ -22,5 +23,12 @@ export class UserController {
 	async updateProfile(@CurrentUser('id') id: string, @Body() dto: UserDto) {
 		const { password, ...data } = await this.userService.update(id, dto)
 		return data
+	}
+
+	@HttpCode(200)
+	@Auth()
+	@Get()
+	async getProfileData(@CurrentUser('id') id: string) {
+		return await this.userService.getProfileData(id)
 	}
 }

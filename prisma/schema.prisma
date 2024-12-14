@@ -22,7 +22,7 @@ model User {
   isAdmin  Boolean? @default(false) @map("is_admin")
 
   plan      Plan   @relation(fields: [planId], references: [id])
-  planId    Int    @map("plan_id") @default(1)
+  planId    Int    @default(1) @map("plan_id")
   planAlias String @default("free")
 
   createdAt   DateTime      @default(now()) @map("created_at")
@@ -163,11 +163,22 @@ model Plan {
 }
 
 enum Platform {
-  wordpress
+  bigcommerce
+  bubble
+  drupal
+  jimdo
   joomla
-  squarespace
-  shopify
+  magento
   other
+  prestashop
+  salesforce
+  shopify
+  squareonline
+  squarespace
+  webflow
+  weebly
+  wix
+  wordpress
 }
 
 enum Support {
