@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common'
-import { hash } from 'argon2'
+import { hash, limits } from 'argon2'
 import { randomBytes } from 'crypto'
 import { AuthDto } from 'src/modules/auth/dto/auth.dto'
 import { PrismaService } from 'src/prisma.service'
 import { UserDto } from './user.dto'
+import { ProjectService } from '../project/project.service'
 
 @Injectable()
 export class UserService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private projectService: ProjectService,
+	) {}
 
 	async create(dto: AuthDto) {
 		const user = {
@@ -59,6 +63,28 @@ export class UserService {
 				apiKey: apiKey,
 			},
 		})
+	}
+
+	async getCurrentPlan(id: number) {
+		return this.prisma.plan.findFirst({
+			where: {
+				id,
+			},
+		})
+	}
+
+	async getProfileData(id: string) {
+		const { password, ...user } = await this.getById(id)
+
+		const projects = await this.projectService.getAll(id)
+
+		const planInfo = await this.getCurrentPlan(user.planId)
+
+		return {
+			user: user,
+			projects: projects,
+			plan: planInfo,
+		}
 	}
 
 	private async generateApiKey() {
