@@ -12,6 +12,7 @@ import {
 import { Request, Response } from 'express'
 import { AuthService } from './auth.service'
 import { AuthDto } from './dto/auth.dto'
+import { GoogleAuthDto } from './dto/google-auth.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +22,7 @@ export class AuthController {
 	@HttpCode(200)
 	@Post('login')
 	async login(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response) {
-		const { tokens, ...response } = await this.authService.login(dto)
+		const { tokens, ...response } = await this.authService.login(dto, false)
 		this.authService.addRefreshTokenToResponse(res, tokens.refreshToken)
 
 		return { response, accessToken: tokens.accessToken }
@@ -42,6 +43,12 @@ export class AuthController {
 		this.authService.addRefreshTokenToResponse(res, refreshToken)
 
 		return response
+	}
+
+	@HttpCode(200)
+	@Post('google')
+	async googleAuth(@Body() dto: GoogleAuthDto) {
+		return await this.authService.googleAuth(dto)
 	}
 
 	@HttpCode(200)

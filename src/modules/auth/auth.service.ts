@@ -10,6 +10,8 @@ import { verify } from 'argon2'
 import { Response } from 'express'
 import { UserService } from 'src/modules/user/user.service'
 import { AuthDto } from './dto/auth.dto'
+import { GoogleAuthDto } from './dto/google-auth.dto'
+import { OAuth2Client } from 'google-auth-library'
 
 @Injectable()
 export class AuthService {
@@ -22,8 +24,8 @@ export class AuthService {
 		private configService: ConfigService,
 	) {}
 
-	async login(dto: AuthDto) {
-		const { password, ...user } = await this.validateUser(dto)
+	async login(dto: AuthDto, isGoogleAuth: boolean) {
+		const { password, ...user } = await this.validateUser(dto, isGoogleAuth)
 		const tokens = this.issueTokens(user.id)
 
 		return {
@@ -35,7 +37,8 @@ export class AuthService {
 	async register(dto: AuthDto) {
 		const isExist = await this.userService.getByEmail(dto.email)
 
-		if (isExist) throw new BadRequestException('User alredy exists')
+		if (isExist)
+			throw new BadRequestException('User with this email already exists.')
 
 		const { password, ...user } = await this.userService.create(dto)
 
@@ -45,6 +48,22 @@ export class AuthService {
 			user,
 			tokens,
 		}
+	}
+
+	async googleAuth(dto: GoogleAuthDto) {
+		const ticket = await this.verifyGoogleToken(dto.token)
+
+		const user = await this.userService.getByEmail(ticket.email)
+
+		const authDto: AuthDto = {
+			email: ticket.email,
+			password: ticket.exp.toString(),
+			name: ticket.given_name,
+		}
+
+		if (user) return await this.login(authDto, true)
+
+		return await this.register(authDto)
 	}
 
 	async getNewTokens(refreshToken: string) {
@@ -71,14 +90,22 @@ export class AuthService {
 		return { accessToken, refreshToken }
 	}
 
-	private async validateUser(dto: AuthDto) {
+	private async validateUser(dto: AuthDto, isGoogleAuth: boolean) {
 		const user = await this.userService.getByEmail(dto.email)
 
-		if (!user) throw new NotFoundException('User not found')
+		if (!user)
+			throw new NotFoundException(
+				'User with the provided email address not found. Please check your email and try again.',
+			)
 
-		const isValid = await verify(user.password, dto.password)
+		if (!isGoogleAuth) {
+			const isValid = await verify(user.password, dto.password)
 
-		if (!isValid) throw new UnauthorizedException('Password is incorrect!')
+			if (!isValid)
+				throw new UnauthorizedException(
+					'Incorrect password. Please try again or reset it.',
+				)
+		}
 
 		return user
 	}
@@ -106,5 +133,19 @@ export class AuthService {
 			sameSite:
 				this.configService.get('ENVIRONMENT') === 'prod' ? 'lax' : 'none',
 		})
+	}
+
+	async verifyGoogleToken(token: string) {
+		try {
+			const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+			const ticket = await client.verifyIdToken({
+				idToken: token,
+				audience: process.env.GOOGLE_CLIENT_ID,
+			})
+			const payload = ticket.getPayload()
+			return payload
+		} catch (error) {
+			throw new Error('Invalid or expired token.')
+		}
 	}
 }
