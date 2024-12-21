@@ -47,8 +47,14 @@ export class AuthController {
 
 	@HttpCode(200)
 	@Post('google')
-	async googleAuth(@Body() dto: GoogleAuthDto) {
-		return await this.authService.googleAuth(dto)
+	async googleAuth(
+		@Body() dto: GoogleAuthDto,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		const { tokens, ...response } = await this.authService.googleAuth(dto)
+		this.authService.addRefreshTokenToResponse(res, tokens.refreshToken)
+
+		return response
 	}
 
 	@HttpCode(200)
