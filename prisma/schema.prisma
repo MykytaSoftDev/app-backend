@@ -25,11 +25,12 @@ model User {
   planId    Int    @default(1) @map("plan_id")
   planAlias String @default("free")
 
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
   Pages       Page[]
   Translation Translation[]
   Project     Project[]
+  Statistic   UserStatistic[]
 
   @@index([email, apiKey])
   @@map("users")
@@ -55,6 +56,7 @@ model Project {
   Pages           Page[]
   Translation     Translation[]
   ProjectSettings ProjectSettings[]
+  Statistic       UserStatistic[]
 
   @@unique([userId, domainName])
   @@index([userId, domainName])
@@ -70,13 +72,14 @@ model Page {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String  @map("project_id")
 
-  pageUrl        String        @map("page_url")
-  targetLanguage String        @map("target_language")
-  wordsCount     Int           @default(0) @map("words_count")
-  isExcluded     Boolean       @default(false) @map("is_excluded")
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
+  pageUrl        String          @map("page_url")
+  targetLanguage String          @map("target_language")
+  wordsCount     Int             @default(0) @map("words_count")
+  isExcluded     Boolean         @default(false) @map("is_excluded")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
   Translation    Translation[]
+  Statistic      UserStatistic[]
 
   @@index([userId, projectId])
   @@map("pages")
@@ -103,10 +106,10 @@ model Translation {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@unique([sourceHash, pageId])
   @@index([userId])
   @@index([projectId])
   @@index([pageId, targetLanguage])
-  @@unique([sourceHash, pageId])
   @@map("translations")
 }
 
@@ -160,6 +163,28 @@ model Plan {
 
   @@index([id, planAlias])
   @@map("plans")
+}
+
+model UserStatistic {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @map("project_id")
+
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  pageId String @map("page_id")
+
+  views          Int    @default(0)
+  targetLanguage String @map("target_language")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, projectId, pageId])
+  @@map("user_statistic")
 }
 
 enum Platform {
