@@ -1,6 +1,8 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common'
 import { StatisticService } from './statistic.service'
 import { StatisticDto } from './dto/statistic.dto'
+import { Auth } from '../auth/decorators/auth.decorator'
+import { CurrentUser } from '../auth/decorators/user.decorator'
 
 @Controller('user/statistic/')
 export class StatisticController {
@@ -26,5 +28,20 @@ export class StatisticController {
 		const updatedViews = statistic.views + 1
 
 		return await this.statisticService.updateViews(statistic.id, updatedViews)
+	}
+
+	@Get('views')
+	@Auth()
+	@HttpCode(200)
+	async getViewsStatistic(
+		@CurrentUser('id') userId: string,
+		@Query('language') language: string,
+		@Query('period') period: 'last7Days' | 'month' | 'lastMonth',
+	) {
+		return await this.statisticService.getViewsStatistic(
+			userId,
+			language,
+			period,
+		)
 	}
 }

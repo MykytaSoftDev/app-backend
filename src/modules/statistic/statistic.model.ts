@@ -5,11 +5,12 @@ import { StatisticService } from './statistic.service'
 import { ProjectService } from '../project/project.service'
 import { SettingsModule } from '../settings/settings.module'
 import { PageService } from '../page/page.service'
+import { LanguageService } from 'src/services/language.service'
 
 @Module({
 	imports: [SettingsModule],
 	controllers: [StatisticController],
-	providers: [StatisticService, PrismaService, ProjectService, PageService],
+	providers: [StatisticService, PrismaService, ProjectService, PageService, LanguageService],
 	exports: [StatisticService],
 })
 export class StatisticModule {}
