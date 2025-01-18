@@ -78,12 +78,50 @@ export class UserService {
 
 		const projects = await this.projectService.getAll(id)
 
-		const planInfo = await this.getCurrentPlan(user.planId)
+		const plan = await this.getCurrentPlan(user.planId)
+
+		const totalWords = projects.reduce(
+			(sum, project) => sum + project.wordsCount,
+			0,
+		)
+
+		const totalTargetLanguages = projects.reduce((set, project) => {
+			project.targetLanguages.forEach(lang => set.add(lang))
+			return set
+		}, new Set()).size
+
+		const percentageUsage = {
+			words: {
+				percents: Math.min(
+					100,
+					Math.round((totalWords / plan.wordsLimit) * 100),
+				),
+				count: totalWords,
+				isExceed: plan.wordsLimit < totalWords,
+			},
+			projects: {
+				percents: Math.min(
+					100,
+					Math.round((projects.length / plan.projectsLimit) * 100),
+				),
+				count: projects.length,
+				isExceed: plan.projectsLimit < projects.length,
+			},
+			languages: {
+				percents: Math.min(
+					100,
+					Math.round((totalTargetLanguages / plan.languagesLimit) * 100),
+				),
+				count: totalTargetLanguages,
+				isExceed: plan.languagesLimit < totalTargetLanguages,
+			},
+		}
 
 		return {
 			user: user,
 			projects: projects,
-			plan: planInfo,
+			plan: plan,
+			usage: percentageUsage,
 		}
 	}
 

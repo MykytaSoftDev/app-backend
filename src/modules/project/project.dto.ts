@@ -2,6 +2,7 @@ import { Platform } from '@prisma/client'
 import {
 	ArrayNotEmpty,
 	IsArray,
+	IsBoolean,
 	IsEnum,
 	IsNumber,
 	IsOptional,
@@ -10,6 +11,7 @@ import {
 
 export class ProjectDto {
 	@IsString()
+	@IsOptional()
 	domainName: string
 
 	@IsEnum(Platform)
@@ -29,4 +31,8 @@ export class ProjectDto {
 	@IsNumber()
 	@IsOptional()
 	wordsCount: number
+
+	@IsBoolean()
+	@IsOptional()
+	isPublished: boolean
 }

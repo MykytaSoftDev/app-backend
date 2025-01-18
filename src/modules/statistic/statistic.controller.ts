@@ -35,11 +35,13 @@ export class StatisticController {
 	@HttpCode(200)
 	async getViewsStatistic(
 		@CurrentUser('id') userId: string,
+		@Query('projectId') projectId: string,
 		@Query('language') language: string,
 		@Query('period') period: 'last7Days' | 'month' | 'lastMonth',
 	) {
 		return await this.statisticService.getViewsStatistic(
 			userId,
+			projectId,
 			language,
 			period,
 		)

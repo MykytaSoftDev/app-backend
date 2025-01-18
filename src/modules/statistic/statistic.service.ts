@@ -95,6 +95,7 @@ export class StatisticService {
 
 	async getViewsStatistic(
 		userId: string,
+		projectId: string,
 		language: string,
 		period: 'last7Days' | 'month' | 'lastMonth',
 	) {
@@ -128,6 +129,7 @@ export class StatisticService {
 		const statistics = await this.prisma.userStatistic.findMany({
 			where: {
 				userId,
+				projectId,
 				targetLanguage: language,
 				createdAt: {
 					gte: startDate,
