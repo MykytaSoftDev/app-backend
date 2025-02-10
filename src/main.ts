@@ -8,7 +8,7 @@ async function bootstrap() {
 	app.setGlobalPrefix('api')
 	app.use(cookieParser())
 	app.enableCors({
-		origin: [process.env.FRONTEND, process.env.CDN],
+		origin: [process.env.FRONTEND, process.env.CDN, 'http://localhost:5501'],
 		credentials: true,
 		exposedHeaders: 'set-cookie',
 	})

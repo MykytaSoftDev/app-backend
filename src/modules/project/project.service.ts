@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
 import { SettingsService } from '../settings/settings.service'
 import { ProjectDto } from './project.dto'
+import { randomBytes } from 'crypto'
 
 @Injectable()
 export class ProjectService {
@@ -14,6 +15,7 @@ export class ProjectService {
 		const project = await this.prisma.project.create({
 			data: {
 				...dto,
+				projectKey: await this.generateApiKey(),
 				user: {
 					connect: {
 						id: userId,
@@ -73,5 +75,26 @@ export class ProjectService {
 				domainName: domainName,
 			},
 		})
+	}
+
+	async getProjectByProjectKey(projectKey: string) {
+		return this.prisma.project.findFirst({
+			select: {
+				id: true,
+				sourceLanguage: true,
+				targetLanguages: true,
+				isPublished: true,
+				domainName: true,
+			},
+			where: {
+				projectKey: projectKey,
+			},
+		})
+	}
+
+	private async generateApiKey() {
+		const prefix = process.env.KEY_PREFIX
+		const apiKey = `${prefix}_${randomBytes(16).toString('hex')}`
+		return apiKey
 	}
 }

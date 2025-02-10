@@ -20,6 +20,14 @@ export class SettingsService {
 
 	async getProjectSettings(projectId: string) {
 		return this.prisma.projectSettings.findFirst({
+			select: {
+				flags: true,
+				flagType: true,
+				title: true,
+				widgetStyle: true,
+				widgetCorners: true,
+				urlStructure: true,
+			},
 			where: {
 				projectId: projectId,
 			},

@@ -8,10 +8,10 @@ export class WidgetController {
 	@Get()
 	@HttpCode(200)
 	async getWidgetConfigs(
-		@Query('apiKey') apiKey: string,
-		@Query('referrer') referrer: string,
+		@Query('projectKey') projectKey: string,
+		@Query('domain') domain: string,
 	) {
 		
-		return await this.widgetService.getWidgetConfigs(apiKey, referrer)
+		return await this.widgetService.getWidgetConfigs(projectKey, domain)
 	}
 }

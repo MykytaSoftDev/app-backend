@@ -41,6 +41,7 @@ model Project {
 
   domainName      String    @map("domain_name")
   projectName     String    @default("My Website") @map("project_name")
+  projectKey      String    @unique @map("project_key")
   platform        Platform?
   sourceLanguage  String    @map("source_language")
   targetLanguages String[]  @default([]) @map("target_languages")

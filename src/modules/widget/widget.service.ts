@@ -15,25 +15,24 @@ export class WidgetService {
 		private settingsService: SettingsService,
 	) {}
 
-	async getWidgetConfigs(apiKey: string, referrer: string) {
-		if (!apiKey) return { error: 'Api Key is Required' }
+	async getWidgetConfigs(projectKey: string, domain: string) {
+		if (!projectKey) return { error: 'Api Key is Required' }
 
-		const userId = (await this.userService.getUserByApiKey(apiKey)).id
-		const { hostname: domainName, pathname: pagePath } = new URL(
-			await this.decodeFromBase64(referrer),
-		)
-		const project = await this.projectService.getProjectByDomainName(
-			userId,
-			domainName,
-		)
+		// const domainName = await this.decodeFromBase64(domain)
+		const domainName = atob(domain)
+		const project = await this.projectService.getProjectByProjectKey(projectKey)
+		console.log(project)
 
 		if (!project) return { error: 'Project does not exist' }
-
-		const { isExcluded } = await this.pageService.isExcluded(
-			userId,
-			project.id,
-			pagePath,
-		)
+		console.log(domainName)
+		console.log(project.domainName)
+		if (domainName !== project.domainName)
+			return { error: 'This project is not related to this domain' }
+		// const { isExcluded } = await this.pageService.isExcluded(
+		// 	userId,
+		// 	project.id,
+		// 	pagePath,
+		// )
 
 		const targetLanguagesDetails =
 			await this.languageService.getTargetLanguagesDetails(
@@ -48,11 +47,8 @@ export class WidgetService {
 
 		return {
 			sourceLanguage: sourceLanguage,
-			sourceLanguageCode: project.sourceLanguage,
-			targetLanguagesCodes: project.targetLanguages,
 			targetLanguages: targetLanguagesDetails,
 			isPublished: project.isPublished,
-			isExcluded: isExcluded,
 			settings: projectSettings,
 		}
 	}
