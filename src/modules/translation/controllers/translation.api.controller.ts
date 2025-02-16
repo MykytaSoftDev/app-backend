@@ -10,17 +10,14 @@ import {
 import { TranslationApiDto } from '../dto/translation.api.dto'
 import { TranslationService } from '../translation.service'
 
-@Controller('project/:projectId/translate')
+@Controller('project/translate')
 export class TranslationApiController {
 	constructor(private translationService: TranslationService) {}
 
 	@Post()
 	@HttpCode(200)
 	@UsePipes(new ValidationPipe())
-	async translate(
-		@Body() dto: TranslationApiDto,
-		@Param('projectId') projectId: string,
-	) {
-		return await this.translationService.translate(dto, projectId)
+	async translate(@Body() dto: TranslationApiDto) {
+		return await this.translationService.translate(dto)
 	}
 }

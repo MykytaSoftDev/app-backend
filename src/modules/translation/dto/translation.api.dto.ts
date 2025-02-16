@@ -2,7 +2,7 @@ import { IsArray, IsOptional, IsString } from 'class-validator'
 
 export class TranslationApiDto {
 	@IsString()
-	apiKey: string
+	projectKey: string
 
 	@IsOptional()
 	@IsArray()

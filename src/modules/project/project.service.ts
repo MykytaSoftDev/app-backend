@@ -81,6 +81,7 @@ export class ProjectService {
 		return this.prisma.project.findFirst({
 			select: {
 				id: true,
+				userId: true,
 				sourceLanguage: true,
 				targetLanguages: true,
 				isPublished: true,

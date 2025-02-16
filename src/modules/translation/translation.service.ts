@@ -52,47 +52,43 @@ export class TranslationService {
 		})
 	}
 
-	async translate(dto: TranslationApiDto, projectId: string) {
+	async translate(dto: TranslationApiDto) {
 		const {
 			segments,
 			referrer,
-			apiKey,
+			projectKey,
 			sourceLanguageCode,
 			targetLanguageCode,
 		} = dto
-
-		const user = await this.userService.getUserByApiKey(apiKey)
-
-		if (!user) return { error: 'User not found' }
-
-		const project = await this.projectService.getProjectById(projectId)
+		const project = await this.projectService.getProjectByProjectKey(projectKey)
 
 		if (!project) return { error: 'Project not found' }
 
-		const pagePath = await decodeFromBase64(dto.referrer)
+		const pagePath = atob(dto.referrer)
 
 		let page = await this.pageService.getPageByPath(
-			user.id,
-			projectId,
+			project.userId,
+			project.id,
 			pagePath,
 			targetLanguageCode,
 		)
 
 		if (!page) {
-			return await this.createTranslation(dto, user.id, project.id)
+			return await this.createTranslation(dto, project.userId, project.id)
 		}
 
 		const translatedSegments = await this.getTranslations(
-			user.id,
+			project.userId,
 			project.id,
 			page.id,
 			targetLanguageCode,
+			segments,
 		)
 
 		if (translatedSegments.length !== segments.length) {
 			const newTranslations = await this.updateTranslations(
 				dto,
-				user.id,
+				project.userId,
 				project.id,
 				page.id,
 			)
@@ -108,10 +104,19 @@ export class TranslationService {
 		projectId: string,
 		pageId: string,
 		targetLanguage: string,
+		segments: string[],
 	) {
-		return this.prisma.translation.findMany({
+		const hashedSegments = await Promise.all(
+			segments.map(async segment => ({
+				text: segment,
+				hash: await this.createSourceHash(segment),
+			})),
+		)
+		const segmentHashes = hashedSegments.map(({ hash }) => hash)
+
+		const existingTranslations = await this.prisma.translation.findMany({
 			select: {
-				sourceText: true,
+				sourceHash: true,
 				translatedText: true,
 			},
 			where: {
@@ -119,8 +124,18 @@ export class TranslationService {
 				projectId,
 				pageId,
 				targetLanguage,
+				sourceHash: { in: segmentHashes },
 			},
 		})
+
+		const translationMap = new Map(
+			existingTranslations.map(t => [t.sourceHash, t.translatedText]),
+		)
+
+		return hashedSegments.map(({ hash, text }) => ({
+			sourceText: text,
+			translatedText: translationMap.get(hash) || '', // Return empty if not found
+		}))
 	}
 
 	async createTranslation(
@@ -128,7 +143,7 @@ export class TranslationService {
 		userId: string,
 		projectId: string,
 	) {
-		const pagePath = await decodeFromBase64(dto.referrer)
+		const pagePath = atob(dto.referrer)
 
 		// Calculate words count for all segments
 		const wordsCount = await this.wordCounterService.calculateWords(
@@ -205,16 +220,18 @@ export class TranslationService {
 		pageId: string,
 	) {
 		const { segments, sourceLanguageCode, targetLanguageCode } = dto
+		console.log('updateTranslations, segments:', segments.length)
 
-		// Hash generation for segments
+		// Хеширование всех сегментов
 		const hashedSegments = await Promise.all(
 			segments.map(async segment => ({
 				text: segment,
 				hash: await this.createSourceHash(segment),
 			})),
 		)
+		console.log('updateTranslations, hashedSegments:', hashedSegments.length)
 
-		// Current translations from db
+		// Получение текущих переводов из БД
 		const existingTranslations = await this.prisma.translation.findMany({
 			where: { userId, projectId, pageId, targetLanguage: targetLanguageCode },
 			select: {
@@ -224,15 +241,35 @@ export class TranslationService {
 				translatedText: true,
 			},
 		})
-
-		const existingHashes = new Set(existingTranslations.map(t => t.sourceHash))
-		const newHashes = new Set(hashedSegments.map(segment => segment.hash))
-
-		// Removing deprecated translations
-		const unusedTranslations = existingTranslations.filter(
-			translation => !newHashes.has(translation.sourceHash),
+		console.log(
+			'updateTranslations, existingTranslations:',
+			existingTranslations.length,
 		)
 
+		// Создаем мапу уже существующих переводов { hash -> перевод }
+		const translationMap = new Map(
+			existingTranslations.map(t => [t.sourceHash, t.translatedText]),
+		)
+
+		// Определяем хеши всех сегментов
+		const allHashes = new Set(hashedSegments.map(segment => segment.hash))
+		const existingHashes = new Set(existingTranslations.map(t => t.sourceHash))
+
+		// Определяем новые и устаревшие сегменты
+		const newSegments = hashedSegments.filter(
+			segment => !existingHashes.has(segment.hash),
+		)
+		const unusedTranslations = existingTranslations.filter(
+			t => !allHashes.has(t.sourceHash),
+		)
+
+		console.log('updateTranslations, newSegments.length:', newSegments.length)
+		console.log(
+			'updateTranslations, unusedTranslations.length:',
+			unusedTranslations.length,
+		)
+
+		// Удаляем устаревшие переводы
 		if (unusedTranslations.length > 0) {
 			const unusedIds = unusedTranslations.map(t => t.id)
 			await this.prisma.translation.deleteMany({
@@ -240,25 +277,21 @@ export class TranslationService {
 			})
 		}
 
-		// Find new segments
-		const newSegments = hashedSegments.filter(
-			segment => !existingHashes.has(segment.hash),
-		)
-
-		if (newSegments.length === 0 && unusedTranslations.length === 0) {
-			// If no updates return translations
-			return existingTranslations.map(translation => ({
-				sourceText: translation.sourceText,
-				translatedText: translation.translatedText,
+		// Если нет новых сегментов, просто возвращаем уже существующие переводы в порядке входных сегментов
+		if (newSegments.length === 0) {
+			return hashedSegments.map(({ hash, text }) => ({
+				sourceText: text,
+				translatedText: translationMap.get(hash) || '',
 			}))
 		}
 
+		// Определяем сервис перевода (DeepL или Google)
 		const supportedTranslationService = await this.getSupportedService(
 			sourceLanguageCode,
 			targetLanguageCode,
 		)
 
-		// New segments translation
+		// Перевод новых сегментов
 		const translationTasks = newSegments.map(async segment => {
 			try {
 				const translationService =
@@ -271,6 +304,9 @@ export class TranslationService {
 					sourceLanguageCode,
 					targetLanguageCode,
 				)
+
+				// Сохраняем перевод в мапу
+				translationMap.set(segment.hash, translatedText)
 
 				return {
 					sourceLanguage: sourceLanguageCode,
@@ -289,7 +325,7 @@ export class TranslationService {
 			Boolean,
 		)
 
-		// Saving ...
+		// Сохраняем новые переводы в БД
 		await this.prisma.translation.createMany({
 			data: newTranslations.map(translation => ({
 				userId,
@@ -311,16 +347,11 @@ export class TranslationService {
 			pageId,
 		)
 
-		// Updated translations
-		return [
-			...existingTranslations
-				.filter(t => newHashes.has(t.sourceHash))
-				.map(translation => ({
-					sourceText: translation.sourceText,
-					translatedText: translation.translatedText,
-				})),
-			...newTranslations,
-		]
+		// Возвращаем переводы в порядке входных сегментов, используя translationMap
+		return hashedSegments.map(({ hash, text }) => ({
+			sourceText: text,
+			translatedText: translationMap.get(hash) || '',
+		}))
 	}
 
 	async getSupportedService(
