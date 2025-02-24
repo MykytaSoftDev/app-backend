@@ -134,6 +134,7 @@ export class TranslationService {
 
 		return hashedSegments.map(({ hash, text }) => ({
 			sourceText: text,
+			hashedSourceText: hash,
 			translatedText: translationMap.get(hash) || '', // Return empty if not found
 		}))
 	}
@@ -193,7 +194,6 @@ export class TranslationService {
 		})
 
 		const translations = (await Promise.all(translationTasks)).filter(Boolean)
-
 		// Saving...
 		await this.prisma.translation.createMany({
 			data: translations.map(translation => ({
@@ -206,6 +206,7 @@ export class TranslationService {
 				translatedText: translation.translatedText,
 				sourceHash: translation.sourceHash,
 			})),
+			skipDuplicates: true,
 		})
 
 		await this.wordCounterService.recountProjectWords(userId, projectId)
@@ -281,6 +282,7 @@ export class TranslationService {
 		if (newSegments.length === 0) {
 			return hashedSegments.map(({ hash, text }) => ({
 				sourceText: text,
+				hashedSourceText: hash,
 				translatedText: translationMap.get(hash) || '',
 			}))
 		}
@@ -350,6 +352,7 @@ export class TranslationService {
 		// Возвращаем переводы в порядке входных сегментов, используя translationMap
 		return hashedSegments.map(({ hash, text }) => ({
 			sourceText: text,
+			hashedSourceText: hash,
 			translatedText: translationMap.get(hash) || '',
 		}))
 	}
