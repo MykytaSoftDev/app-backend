@@ -5,6 +5,7 @@ import { ProjectService } from '../project/project.service'
 import { decodeFromBase64 } from 'src/helpers/dev.helper'
 import { PageService } from '../page/page.service'
 import { LanguageService } from 'src/services/language.service'
+import { UserService } from '../user/user.service'
 
 @Injectable()
 export class StatisticService {
@@ -13,6 +14,7 @@ export class StatisticService {
 		private projectService: ProjectService,
 		private pageService: PageService,
 		private languageService: LanguageService,
+		private userService: UserService,
 	) {}
 
 	async create(dto: CreateStatisticDto) {
@@ -51,20 +53,17 @@ export class StatisticService {
 	}
 
 	async getStatistic(dto: StatisticDto) {
-		const user = await this.prisma.user.findFirst({
-			where: {
-				apiKey: dto.apiKey,
-			},
-		})
-
-		if (!user)
-			throw new NotFoundException('User was not found by provided apiKey')
-
-		const project = await this.projectService.getProjectById(dto.projectId)
+		const project = await this.projectService.getProjectByProjectKey(
+			dto.projectKey,
+		)
 
 		if (!project) throw new NotFoundException('Project was not found')
 
-		const decodedReferrer = await decodeFromBase64(dto.referrer)
+		const user = await this.userService.getById(project.userId)
+
+		if (!user) throw new NotFoundException('User was not found')
+
+		const decodedReferrer = atob(dto.referrer)
 
 		const page = await this.pageService.getPageByPath(
 			user.id,

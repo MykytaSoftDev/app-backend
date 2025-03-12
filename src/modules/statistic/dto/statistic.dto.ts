@@ -2,7 +2,7 @@ import { IsString } from 'class-validator'
 
 export class StatisticDto {
 	@IsString()
-	apiKey: string
+	projectKey: string
 
 	@IsString()
 	referrer: string

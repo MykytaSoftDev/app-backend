@@ -4,11 +4,11 @@ import { StatisticDto } from './dto/statistic.dto'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from '../auth/decorators/user.decorator'
 
-@Controller('user/statistic/')
+@Controller('statistic/')
 export class StatisticController {
 	constructor(private statisticService: StatisticService) {}
 
-	@Post()
+	@Post('update')
 	@HttpCode(200)
 	async updateStatistic(@Body() dto: StatisticDto) {
 		const { user, project, page, statistic } =

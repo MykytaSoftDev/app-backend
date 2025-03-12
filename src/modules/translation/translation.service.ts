@@ -8,7 +8,6 @@ import { ProjectService } from '../project/project.service'
 import { UserService } from '../user/user.service'
 import { TranslationApiDto } from './dto/translation.api.dto'
 import { TranslationDto } from './dto/translation.dto'
-import { decodeFromBase64 } from '../../helpers/dev.helper'
 import { GoogleService } from 'src/services/translation.services/google.service'
 import { LanguageCode } from 'deepl-node'
 
@@ -21,7 +20,6 @@ export class TranslationService {
 		private pageService: PageService,
 		private projectService: ProjectService,
 		private wordCounterService: WordCounterService,
-		private userService: UserService,
 	) {}
 
 	async create(
@@ -85,7 +83,11 @@ export class TranslationService {
 			segments,
 		)
 
-		if (translatedSegments.length !== segments.length) {
+		const filteredTranslatedSegments = translatedSegments.filter(el => {
+			if (el.translatedText) return el
+		})
+
+		if (filteredTranslatedSegments.length !== segments.length) {
 			const newTranslations = await this.updateTranslations(
 				dto,
 				project.userId,
