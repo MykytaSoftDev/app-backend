@@ -15,7 +15,7 @@ import { CurrentUser } from 'src/modules/auth/decorators/user.decorator'
 import { ProjectDto } from './project.dto'
 import { ProjectService } from './project.service'
 
-@Controller('user/projects')
+@Controller({path: 'user/projects', version: process.env.API_VERSION})
 export class ProjectController {
 	constructor(private readonly projectService: ProjectService) {}
 

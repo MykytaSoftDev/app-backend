@@ -12,7 +12,7 @@ import { CurrentUser } from 'src/modules/auth/decorators/user.decorator'
 import { UserDto } from './user.dto'
 import { UserService } from './user.service'
 
-@Controller('user/profile')
+@Controller({ path: 'user/profile', version: process.env.API_VERSION })
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 

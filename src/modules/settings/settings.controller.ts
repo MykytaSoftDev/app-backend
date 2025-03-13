@@ -1,4 +1,7 @@
 import { Controller } from '@nestjs/common'
 
-@Controller('project/:projectId/settings')
+@Controller({
+	path: 'project/:projectId/settings',
+	version: process.env.API_VERSION,
+})
 export class SettingsController {}

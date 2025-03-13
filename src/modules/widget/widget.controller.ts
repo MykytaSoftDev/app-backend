@@ -1,7 +1,7 @@
 import { Controller, Get, HttpCode, Query } from '@nestjs/common'
 import { WidgetService } from './widget.service'
 
-@Controller('widget')
+@Controller({ path: 'widget', version: process.env.API_VERSION })
 export class WidgetController {
 	constructor(private widgetService: WidgetService) {}
 
@@ -11,7 +11,6 @@ export class WidgetController {
 		@Query('projectKey') projectKey: string,
 		@Query('domain') domain: string,
 	) {
-		
 		return await this.widgetService.getWidgetConfigs(projectKey, domain)
 	}
 }

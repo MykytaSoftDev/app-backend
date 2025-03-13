@@ -14,7 +14,7 @@ import { AuthService } from './auth.service'
 import { AuthDto } from './dto/auth.dto'
 import { GoogleAuthDto } from './dto/google-auth.dto'
 
-@Controller('auth')
+@Controller({ path: 'auth', version: process.env.API_VERSION })
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 

@@ -13,7 +13,7 @@ import {
 import { PageDto } from '../page.dto'
 import { PageService } from '../page.service'
 
-@Controller('user/:userId/project/:projectId/pages')
+@Controller({path: 'user/:userId/project/:projectId/pages', version: process.env.API_VERSION})
 export class PageApiController {
 	constructor(private readonly pageService: PageService) {}
 

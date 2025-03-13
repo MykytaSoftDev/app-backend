@@ -1,10 +1,10 @@
 import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common'
-import { StatisticService } from './statistic.service'
-import { StatisticDto } from './dto/statistic.dto'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from '../auth/decorators/user.decorator'
+import { StatisticDto } from './dto/statistic.dto'
+import { StatisticService } from './statistic.service'
 
-@Controller('statistic/')
+@Controller({ path: 'statistic/', version: process.env.API_VERSION })
 export class StatisticController {
 	constructor(private statisticService: StatisticService) {}
 

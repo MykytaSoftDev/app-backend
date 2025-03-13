@@ -2,7 +2,6 @@ import {
 	Body,
 	Controller,
 	HttpCode,
-	Param,
 	Post,
 	UsePipes,
 	ValidationPipe,
@@ -10,7 +9,7 @@ import {
 import { TranslationApiDto } from '../dto/translation.api.dto'
 import { TranslationService } from '../translation.service'
 
-@Controller('project/translate')
+@Controller({ path: 'project/translate', version: process.env.API_VERSION })
 export class TranslationApiController {
 	constructor(private translationService: TranslationService) {}
 
