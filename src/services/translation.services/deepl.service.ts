@@ -3,8 +3,8 @@ import {
 	SourceLanguageCode,
 	TargetLanguageCode,
 	TagHandlingMode,
-	Translator,
-} from 'deepl-node'
+	Translator, TextResult
+} from "deepl-node";
 
 @Injectable()
 export class DeeplService {
@@ -15,21 +15,22 @@ export class DeeplService {
 	}
 
 	async translate(
-		segment: string,
+		segments: string[],
 		sourceLanguage: string,
 		targetLanguage: string,
-	) {
+	): Promise<TextResult[]> {
 		const options = {
 			tagHandling: 'html' as TagHandlingMode,
 		}
 
 		const result = await this.translator.translateText(
-			segment,
+			segments,
 			sourceLanguage as SourceLanguageCode,
 			targetLanguage as TargetLanguageCode,
 			options,
 		)
-		return result.text
+
+		return result
 	}
 
 	async getSourceLanguages() {

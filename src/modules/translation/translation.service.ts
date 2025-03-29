@@ -75,6 +75,7 @@ export class TranslationService {
 			return await this.createTranslation(dto, project.userId, project.id)
 		}
 
+		// TODO Update this function
 		const translatedSegments = await this.getTranslations(
 			project.userId,
 			project.id,
@@ -82,7 +83,6 @@ export class TranslationService {
 			targetLanguageCode,
 			segments,
 		)
-
 		const filteredTranslatedSegments = translatedSegments.filter(el => {
 			if (el.translatedText) return el
 		})
@@ -168,37 +168,32 @@ export class TranslationService {
 			projectId,
 		)
 
-		// Translating segments
-		const translationTasks = dto.segments.map(async segment => {
-			try {
-				const translationService =
-					supportedTranslationService === 'deepl'
-						? this.deeplService
-						: this.googleService
+		// Resulted object
+		const translatedArray = []
 
-				const translatedText = await translationService.translate(
-					segment,
-					dto.sourceLanguageCode,
-					dto.targetLanguageCode,
-				)
+		if (supportedTranslationService === 'deepl') {
+			const textResult = await this.deeplService.translate(
+				dto.segments,
+				dto.sourceLanguageCode,
+				dto.targetLanguageCode
+			)
 
-				return {
+			for (let i = 0; i < dto.segments.length; i++) {
+				translatedArray.push({
 					sourceLanguage: dto.sourceLanguageCode,
 					targetLanguage: dto.targetLanguageCode,
-					sourceText: segment,
-					translatedText,
-					sourceHash: await this.createSourceHash(segment),
-				}
-			} catch (error) {
-				console.error(`Translation failed for segment: ${segment}`, error)
-				return null
+					sourceText: dto.segments[i],
+					translatedText: textResult[i].text,
+					sourceHash: await this.createSourceHash(dto.segments[i]),
+				})
 			}
-		})
+		} else {
+			// TODO Finish logic for Google translation
+		}
 
-		const translations = (await Promise.all(translationTasks)).filter(Boolean)
 		// Saving...
 		await this.prisma.translation.createMany({
-			data: translations.map(translation => ({
+			data: translatedArray.map(translation => ({
 				userId,
 				projectId,
 				pageId: newPage.id,
@@ -213,7 +208,10 @@ export class TranslationService {
 
 		await this.wordCounterService.recountProjectWords(userId, projectId)
 
-		return translations
+		return translatedArray.map(translation => ({
+			sourceText: translation.sourceText,
+			translatedText: translation.translatedText
+		}));
 	}
 
 	async updateTranslations(
@@ -295,43 +293,35 @@ export class TranslationService {
 			targetLanguageCode,
 		)
 
-		// Перевод новых сегментов
-		const translationTasks = newSegments.map(async segment => {
-			try {
-				const translationService =
-					supportedTranslationService === 'deepl'
-						? this.deeplService
-						: this.googleService
+		// Resulted object
+		const translatedArray = []
 
-				const translatedText = await translationService.translate(
-					segment.text,
-					sourceLanguageCode,
-					targetLanguageCode,
-				)
+		if (supportedTranslationService === 'deepl') {
+			let textResult = await this.deeplService.translate(
+				newSegments.map(segment => segment.text),
+				dto.sourceLanguageCode,
+				dto.targetLanguageCode,
+			)
 
-				// Сохраняем перевод в мапу
-				translationMap.set(segment.hash, translatedText)
-
-				return {
+			for (let i = 0; i < newSegments.length; i++) {
+				translatedArray.push({
 					sourceLanguage: sourceLanguageCode,
 					targetLanguage: targetLanguageCode,
-					sourceText: segment.text,
-					translatedText,
-					sourceHash: segment.hash,
-				}
-			} catch (error) {
-				console.error(`Translation failed for segment: ${segment.text}`, error)
-				return null
+					sourceText: newSegments[i].text,
+					translatedText: textResult[i].text,
+					sourceHash: newSegments[i].hash,
+				})
+
+				translationMap.set(newSegments[i].hash, textResult[i].text)
 			}
-		})
+		} else {
+			// TODO Finish logic for Google translation
 
-		const newTranslations = (await Promise.all(translationTasks)).filter(
-			Boolean,
-		)
+		}
 
-		// Сохраняем новые переводы в БД
+		// Saving new translations into DB
 		await this.prisma.translation.createMany({
-			data: newTranslations.map(translation => ({
+			data: translatedArray.map(translation => ({
 				userId,
 				projectId,
 				pageId,
@@ -354,7 +344,6 @@ export class TranslationService {
 		// Возвращаем переводы в порядке входных сегментов, используя translationMap
 		return hashedSegments.map(({ hash, text }) => ({
 			sourceText: text,
-			hashedSourceText: hash,
 			translatedText: translationMap.get(hash) || '',
 		}))
 	}
