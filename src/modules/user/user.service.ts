@@ -80,6 +80,8 @@ export class UserService {
 
 		const plan = await this.getCurrentPlan(user.planId)
 
+		const views = await this.getViewsStatisticForLastMonth(id)
+
 		const totalWords = projects.reduce(
 			(sum, project) => sum + project.wordsCount,
 			0,
@@ -115,6 +117,11 @@ export class UserService {
 				count: totalTargetLanguages,
 				isExceed: plan.languagesLimit < totalTargetLanguages,
 			},
+			views: {
+				percents: 0,
+				count: views,
+				isExceed: false
+			}
 		}
 
 		return {
@@ -123,6 +130,25 @@ export class UserService {
 			plan: plan,
 			usage: percentageUsage,
 		}
+	}
+
+
+	async getViewsStatisticForLastMonth(userId: string) {
+		const oneMonthAgo = new Date();
+		oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+		const viewsSum = await this.prisma.userStatistic.aggregate({
+			where: {
+				userId: userId,
+				createdAt: {
+					gte: oneMonthAgo, // Только записи за последний месяц
+				},
+			},
+			_sum: {
+				views: true
+			}
+		})
+		return viewsSum._sum.views || 0
 	}
 
 	private async generateApiKey() {

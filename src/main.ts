@@ -10,14 +10,16 @@ async function bootstrap() {
 		type: VersioningType.URI,
 		prefix: 'v',
 	})
+	console.log(app)
 
 	app.setGlobalPrefix('api')
 	app.use(cookieParser())
-	app.enableCors({
-		origin: ['*'],
-		credentials: true,
-		exposedHeaders: 'set-cookie',
-	})
+	// CORS cofigured in nginx
+	// app.enableCors({
+	// 	origin: ['*'],
+	// 	credentials: true,
+	// 	exposedHeaders: 'set-cookie',
+	// })
 	await app.listen(process.env.PORT ?? 3000)
 }
 bootstrap()

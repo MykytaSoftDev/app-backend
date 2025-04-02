@@ -7,7 +7,7 @@ import { SettingsModule } from './modules/settings/settings.module'
 import { TranslationModule } from './modules/translation/translation.module'
 import { UserModule } from './modules/user/user.module'
 import { WidgetModule } from './modules/widget/widget.module'
-import { StatisticModule } from './modules/statistic/statistic.model'
+import { StatisticModule } from './modules/statistic/statistic.module'
 
 @Module({
 	imports: [
