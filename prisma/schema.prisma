@@ -39,15 +39,16 @@ model User {
 model Project {
   id String @id @default(cuid())
 
-  domainName      String    @map("domain_name")
-  projectName     String    @default("My Website") @map("project_name")
-  projectKey      String    @unique @map("project_key")
-  platform        Platform?
-  sourceLanguage  String    @map("source_language")
-  targetLanguages String[]  @default([]) @map("target_languages")
-  wordsCount      Int?      @default(0) @map("words_count")
-  isPublished     Boolean   @default(true) @map("is_published")
-  isActivated     Boolean   @default(false) @map("is_activated")
+  domainName            String    @map("domain_name")
+  projectName           String    @default("My Website") @map("project_name")
+  projectKey            String    @unique @map("project_key")
+  platform              Platform?
+  sourceLanguage        String    @map("source_language")
+  targetLanguages       String[]  @default([]) @map("target_languages")
+  wordsCount            Int?      @default(0) @map("words_count")
+  isPublished           Boolean   @default(true) @map("is_published")
+  newTranslationEnabled Boolean   @default(true) @map("new_translation_enabled")
+  isActivated           Boolean   @default(false) @map("is_activated")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

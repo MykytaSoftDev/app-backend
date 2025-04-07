@@ -46,4 +46,11 @@ export class StatisticController {
 			period,
 		)
 	}
+
+	@Get('views/total')
+	@Auth()
+	@HttpCode(200)
+	async getDashboardChartData(@CurrentUser('id') userId: string) {
+		return await this.statisticService.getDashboardChartData(userId)
+	}
 }

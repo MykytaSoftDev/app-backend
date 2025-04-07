@@ -178,4 +178,25 @@ export class StatisticService {
 
 		return groupedStatistics
 	}
+
+	async getDashboardChartData(userId: string) {
+		const statistics = await this.prisma.userStatistic.findMany({
+			where: {
+				userId: userId,
+				createdAt: {
+					gte: new Date(new Date().setDate(new Date().getDate() - 90)) // Last 90 days
+				}
+			},
+			select: {
+				createdAt: true,
+				targetLanguage: true,
+				views: true
+			},
+			orderBy: {
+				createdAt: 'asc' // or 'desc' for descending
+			}
+		});
+
+		return statistics
+	}
 }
