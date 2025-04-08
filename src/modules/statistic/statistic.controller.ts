@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, Param, Post, Query } from "@nestjs/common";
 import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from '../auth/decorators/user.decorator'
 import { StatisticDto } from './dto/statistic.dto'
@@ -52,5 +52,12 @@ export class StatisticController {
 	@HttpCode(200)
 	async getDashboardChartData(@CurrentUser('id') userId: string) {
 		return await this.statisticService.getDashboardChartData(userId)
+	}
+
+	@Get('views/project/:projectId')
+	@Auth()
+	@HttpCode(200)
+	async getProjectChartData(@CurrentUser('id') userId: string, @Param('projectId') projectId: string) {
+		return await this.statisticService.getProjectChartData(userId, projectId)
 	}
 }

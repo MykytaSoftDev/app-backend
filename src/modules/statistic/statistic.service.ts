@@ -2,10 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
 import { CreateStatisticDto, StatisticDto } from './dto/statistic.dto'
 import { ProjectService } from '../project/project.service'
-import { decodeFromBase64 } from 'src/helpers/dev.helper'
 import { PageService } from '../page/page.service'
 import { LanguageService } from 'src/services/language.service'
 import { UserService } from '../user/user.service'
+import { format } from 'date-fns';
 
 @Injectable()
 export class StatisticService {
@@ -198,5 +198,56 @@ export class StatisticService {
 		});
 
 		return statistics
+	}
+
+	async getProjectChartData(userId: string, projectId: string) {
+		const statistics = await this.prisma.userStatistic.findMany({
+			where: {
+				userId,
+				projectId,
+				createdAt: {
+					gte: new Date(new Date().setDate(new Date().getDate() - 90)), // Last 90 days
+				},
+			},
+			select: {
+				createdAt: true,
+				targetLanguage: true,
+				views: true,
+			},
+			orderBy: {
+				createdAt: 'asc',
+			},
+		});
+
+		const languageSet = new Set<string>();
+		const dateMap: Record<string, Record<string, number>> = {};
+
+		for (const stat of statistics) {
+			const date = format(stat.createdAt, 'yyyy-MM-dd');
+			const lang = stat.targetLanguage;
+
+			languageSet.add(lang);
+
+			if (!dateMap[date]) {
+				dateMap[date] = {};
+			}
+
+			dateMap[date][lang] = (dateMap[date][lang] || 0) + stat.views;
+		}
+
+		const allLanguages = Array.from(languageSet);
+
+		const result = Object.entries(dateMap).map(([date, langViews]) => {
+			const fullLangViews = Object.fromEntries(
+				allLanguages.map(lang => [lang, langViews[lang] || 0])
+			);
+
+			return {
+				date,
+				...fullLangViews,
+			};
+		});
+
+		return result;
 	}
 }
