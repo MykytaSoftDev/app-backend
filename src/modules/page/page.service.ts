@@ -125,4 +125,25 @@ export class PageService {
 
 		return page
 	}
+
+	async deleteMultiple(
+		userId: string,
+		projectId: string,
+		pageIds: string[],
+	) {
+		try {
+			const page = await this.prisma.page.deleteMany({
+				where: {
+					id: { in: pageIds },
+					userId: userId,
+					projectId: projectId,
+				}
+			})
+
+			return page
+		} catch (error) {
+			throw new Error('Error while deleting page.')
+		}
+	}
+
 }

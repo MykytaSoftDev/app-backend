@@ -40,17 +40,6 @@ export class PageApiController {
 		return this.pageService.update(dto, pageId, userId, projectId)
 	}
 
-	@Delete(':id')
-	@HttpCode(200)
-	@UsePipes(new ValidationPipe())
-	async delete(
-		@Param('id') pageId: string,
-		@Param('userId') userId: string,
-		@Param('projectId') projectId: string,
-	) {
-		return this.pageService.delete(pageId, userId, projectId)
-	}
-
 	@Get()
 	@HttpCode(200)
 	async getAll(
