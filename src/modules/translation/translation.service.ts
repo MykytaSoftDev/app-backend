@@ -72,7 +72,11 @@ export class TranslationService {
 		)
 
 		if (!page) {
-			return await this.createTranslation(dto, project.userId, project.id)
+			const result = await this.createTranslation(dto, project.userId, project.id)
+
+			if (!project.isActivated && result) await this.projectService.update({isActivated: true}, project.id, project.userId)
+
+			return result
 		}
 
 		// TODO Update this function

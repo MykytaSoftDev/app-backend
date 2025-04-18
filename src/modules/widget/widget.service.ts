@@ -34,8 +34,6 @@ export class WidgetService {
 		// 	pagePath,
 		// )
 
-		if (!project.isActivated) await this.projectService.update({isActivated: true}, project.id, project.userId)
-
 		const targetLanguagesDetails =
 			await this.languageService.getTargetLanguagesDetails(
 				project.targetLanguages,
