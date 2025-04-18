@@ -38,5 +38,9 @@ export class ProjectDto {
 
 	@IsBoolean()
 	@IsOptional()
+	isActivated: boolean
+
+	@IsBoolean()
+	@IsOptional()
 	newTranslationEnabled?: boolean
 }

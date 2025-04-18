@@ -17,19 +17,28 @@ export class ProjectService {
 	) {}
 
 	async create(dto: ProjectDto, userId: string) {
-		const project = await this.prisma.project.create({
-			data: {
-				...dto,
-				projectKey: await this.generateApiKey(),
-				user: {
-					connect: {
-						id: userId,
+		try {
+			const project = await this.prisma.project.create({
+				data: {
+					...dto,
+					projectKey: await this.generateApiKey(),
+					user: {
+						connect: {
+							id: userId,
+						},
 					},
 				},
-			},
-		})
-		const projectSettings = await this.projectSettingsService.create(project.id)
-		return { project, projectSettings }
+			})
+			const projectSettings = await this.projectSettingsService.create(project.id)
+			return { project, projectSettings }
+		}catch (error) {
+			if (error.code === 'P2002') {
+				// Prisma error when duplicating error
+				throw new ConflictException('Project with this domain already exists.');
+			}
+
+			throw new InternalServerErrorException('Something went wrong while updating the project');
+		}
 	}
 
 	async update(dto: Partial<ProjectDto>, projectId: string, userId: string) {
@@ -108,11 +117,23 @@ export class ProjectService {
 				sourceLanguage: true,
 				targetLanguages: true,
 				isPublished: true,
+				isActivated: true,
 				domainName: true,
 			},
 			where: {
 				projectKey: projectKey,
 			},
+		})
+	}
+
+	async getActivationStatus(projectId: string) {
+		return this.prisma.project.findFirst({
+			where: {
+				id: projectId
+			},
+			select: {
+				isActivated: true,
+			}
 		})
 	}
 
