@@ -8,6 +8,7 @@ import { TranslationModule } from './modules/translation/translation.module'
 import { UserModule } from './modules/user/user.module'
 import { WidgetModule } from './modules/widget/widget.module'
 import { StatisticModule } from './modules/statistic/statistic.module'
+import { ExclusionModule } from "./modules/exclusion/exclusion.module";
 
 @Module({
 	imports: [
@@ -20,6 +21,7 @@ import { StatisticModule } from './modules/statistic/statistic.module'
 		WidgetModule,
 		SettingsModule,
 		StatisticModule,
+		ExclusionModule,
 	],
 })
 export class AppModule {}
