@@ -9,6 +9,7 @@ import { UserModule } from './modules/user/user.module'
 import { WidgetModule } from './modules/widget/widget.module'
 import { StatisticModule } from './modules/statistic/statistic.module'
 import { ExclusionModule } from "./modules/exclusion/exclusion.module";
+import { GlossaryModule } from "./modules/glossary/glossary.module";
 
 @Module({
 	imports: [
@@ -22,6 +23,7 @@ import { ExclusionModule } from "./modules/exclusion/exclusion.module";
 		SettingsModule,
 		StatisticModule,
 		ExclusionModule,
+		GlossaryModule,
 	],
 })
 export class AppModule {}

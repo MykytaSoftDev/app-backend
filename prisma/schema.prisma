@@ -31,6 +31,7 @@ model User {
   Translation Translation[]
   Project     Project[]
   Statistic   UserStatistic[]
+  Glossary    Glossary[]
 
   @@index([email, apiKey])
   @@map("users")
@@ -61,6 +62,7 @@ model Project {
   Statistic            UserStatistic[]
   DomExclusion         BlockExclusion[]
   PageExclusionPattern PageExclusion[]
+  Glossary             Glossary[]
 
   @@unique([userId, domainName])
   @@index([userId, domainName])
@@ -214,6 +216,33 @@ model UserStatistic {
 
   @@index([userId, projectId, pageId])
   @@map("user_statistic")
+}
+
+model Glossary {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @map("project_id")
+
+  sourceText      String           @map("source_text")
+  targetText      String?          @map("target_text")
+  sourceLanguage  String           @map("source_language")
+  targetLanguages String[]         @default([]) @map("target_languages")
+  behavior        GlossaryBehavior
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@index([projectId])
+  @@index([userId])
+  @@map("glossary")
+}
+
+enum GlossaryBehavior {
+  translate
+  keep_original
 }
 
 enum Platform {
