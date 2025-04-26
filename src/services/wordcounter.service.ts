@@ -17,6 +17,9 @@ export class WordCounterService {
 			where: {
 				userId: userId,
 				projectId: projectId,
+				isExcluded: {
+					not: true,
+				},
 			},
 			_sum: {
 				wordsCount: true,
