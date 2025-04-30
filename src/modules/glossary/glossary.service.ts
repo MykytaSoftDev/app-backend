@@ -28,16 +28,18 @@ export class GlossaryService {
   }
 
   async get(userId: string, projectId: string) {
-    await this.prismaService.glossary.findMany({
+    return await this.prismaService.glossary.findMany({
       where: {
         userId: userId,
         projectId: projectId,
       },
       select: {
+        id: true,
         sourceText: true,
         targetText: true,
         sourceLanguage: true,
         targetLanguages: true,
+        behavior: true,
       }
     })
   }
@@ -59,9 +61,9 @@ export class GlossaryService {
     }
   }
 
-  async delete(glossaryId: string, userId: string, projectId: string) {
+  async delete(userId: string, projectId: string, glossaryId: string) {
     try {
-      await this.prismaService.glossary.delete({
+      return await this.prismaService.glossary.delete({
         where: {
           id: glossaryId,
           userId: userId,

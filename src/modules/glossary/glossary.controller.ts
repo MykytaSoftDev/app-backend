@@ -28,7 +28,7 @@ export class GlossaryController {
   @Auth()
   @HttpCode(200)
   async get(
-    @CurrentUser() userId: string,
+    @CurrentUser('id') userId: string,
     @Param('projectId') projectId: string,
   ) {
     return await this.glossaryService.get(userId, projectId)
@@ -51,18 +51,18 @@ export class GlossaryController {
   @Auth()
   @HttpCode(204)
   async delete(
-    @CurrentUser() userId: string,
+    @CurrentUser('id') userId: string,
     @Param('projectId') projectId: string,
     @Param('glossaryId') glossaryId: string,
   ) {
     return await this.glossaryService.delete(userId, projectId, glossaryId)
   }
 
-  @Delete('')
+  @Delete()
   @Auth()
   @HttpCode(204)
   async deleteMultiple(
-    @CurrentUser() userId: string,
+    @CurrentUser('id') userId: string,
     @Param('projectId') projectId: string,
     @Body() body: { ids: string[] },
   ) {

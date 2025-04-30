@@ -20,7 +20,7 @@ export class CreateGlossaryDto {
 
   @IsArray()
   @IsNotEmpty()
-  targetLanguage: string[];
+  targetLanguages: string[];
 
   @IsEnum(GlossaryBehavior)
   behavior: GlossaryBehavior;
