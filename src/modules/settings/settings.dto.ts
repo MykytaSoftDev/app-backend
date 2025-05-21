@@ -1,28 +1,38 @@
-import { StyleRadius, UrlStructure } from '@prisma/client'
-import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator'
+import {
+	FlagDisplayMode, Position,
+	TitleDisplayMode,
+	UrlStructure,
+	WidgetDisplayMode,
+	WidgetStyle
+} from "@prisma/client";
+import { IsEnum, IsOptional, IsString } from 'class-validator'
 
 export class SettingsDto {
 	@IsOptional()
-	@IsBoolean()
-	flags?: boolean
+	@IsEnum(TitleDisplayMode)
+	titleDisplayMode?: TitleDisplayMode
 
 	@IsOptional()
-	@IsBoolean()
-	title?: boolean
+	@IsEnum(FlagDisplayMode)
+	flagDisplayMode?: FlagDisplayMode
 
 	@IsOptional()
-	@IsEnum(StyleRadius)
-	flagType?: StyleRadius
+	@IsEnum(WidgetDisplayMode)
+	widgetDisplayMode?: WidgetDisplayMode
 
 	@IsOptional()
-	@IsEnum(StyleRadius)
-	widgetCorners?: StyleRadius
+	@IsEnum(WidgetStyle)
+	widgetStyle?: WidgetStyle
+
+	@IsOptional()
+	@IsEnum(Position)
+	position?: Position
 
 	@IsOptional()
 	@IsString()
-	widgetStyle?: string
+	customPosition: string
 
 	@IsOptional()
 	@IsEnum(UrlStructure)
-	UrlStructure?: UrlStructure
+	urlStructure?: UrlStructure
 }

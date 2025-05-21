@@ -79,11 +79,17 @@ export class ProjectService {
 	}
 
 	async getAll(userId: string) {
-		return this.prisma.project.findMany({
-			where: {
-				userId: userId,
-			},
-		})
+		try {
+			const result =	await this.prisma.project.findMany({
+				where: {
+					userId: userId,
+				},
+			})
+
+			return result || []
+		}catch (error) {
+			throw new Error(error)
+		}
 	}
 
 	async getProjectById(projectId: string) {

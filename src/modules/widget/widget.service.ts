@@ -44,7 +44,7 @@ export class WidgetService {
 		const projectSettings = await this.settingsService.getProjectSettings(
 			project.id,
 		)
-
+		console.log(projectSettings)
 		return {
 			sourceLanguage: sourceLanguage,
 			targetLanguages: targetLanguagesDetails,

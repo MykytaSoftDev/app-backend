@@ -22,11 +22,12 @@ export class SettingsService {
 		return this.prisma.projectSettings.findFirst({
 			select: {
 				id: true,
-				flags: true,
-				flagType: true,
-				title: true,
+				titleDisplayMode: true,
+				flagDisplayMode: true,
+				widgetDisplayMode: true,
 				widgetStyle: true,
-				widgetCorners: true,
+				position: true,
+				customPosition: true,
 				urlStructure: true,
 			},
 			where: {

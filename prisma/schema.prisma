@@ -160,17 +160,16 @@ model Language {
 }
 
 model ProjectSettings {
-  id        String  @id @default(cuid())
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String  @map("project_id")
-
-  flags    Boolean     @default(true)
-  flagType StyleRadius @default(circle) @map("flag_type")
-
-  title         Boolean      @default(true)
-  widgetStyle   String       @default("dropdown") @map("widget_style")
-  widgetCorners StyleRadius  @default(rectangle) @map("widget_corners")
-  urlStructure  UrlStructure @default(default) @map("url_structure")
+  id                String            @id @default(cuid())
+  project           Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId         String            @map("project_id")
+  titleDisplayMode  TitleDisplayMode  @default(native) @map("title_display_mode")
+  flagDisplayMode   FlagDisplayMode   @default(circle) @map("flag_display_mode")
+  widgetDisplayMode WidgetDisplayMode @default(dropdown) @map("widget_display_mode")
+  widgetStyle       WidgetStyle       @default(rectangle) @map("widget_style")
+  urlStructure      UrlStructure      @default(default) @map("url_structure")
+  position          Position          @default(rightBottom) @map("position")
+  customPosition    String            @default("") @map("custom_position")
 
   @@index([projectId])
   @@map("project_settings")
@@ -277,10 +276,36 @@ enum Support {
   deepl
 }
 
-enum StyleRadius {
+// Settings enums
+enum Position {
+  rightBottom
+  leftBottom
+  rightTop
+  leftTop
+}
+
+enum TitleDisplayMode {
+  none
+  default
+  native
+  code2
+  code3
+}
+
+enum FlagDisplayMode {
+  none
   rectangle
-  square
   circle
+}
+
+enum WidgetDisplayMode {
+  dropdown
+  popup
+}
+
+enum WidgetStyle {
+  rectangle
+  round
 }
 
 enum UrlStructure {

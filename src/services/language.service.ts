@@ -12,6 +12,7 @@ export class LanguageService {
 				title: true,
 				titleNative: true,
 				code2: true,
+				code3: true,
 				isRightToLeft: true,
 				flag: true,
 			},
