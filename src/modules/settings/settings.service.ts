@@ -18,6 +18,21 @@ export class SettingsService {
 		})
 	}
 
+	async update(id: string, projectId: string, settings: SettingsDto) {
+		try {
+			return this.prisma.projectSettings.update({
+				data: settings,
+				where: {
+					id: id,
+					projectId: projectId
+				}
+			})
+
+		}catch (error) {
+			console.error(error)
+		}
+	}
+
 	async getProjectSettings(projectId: string) {
 		return this.prisma.projectSettings.findFirst({
 			select: {
