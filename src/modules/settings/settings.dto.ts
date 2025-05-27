@@ -5,7 +5,7 @@ import {
 	WidgetDisplayMode,
 	WidgetStyle
 } from "@prisma/client";
-import { IsEnum, IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsEnum, IsOptional, IsString } from "class-validator";
 
 export class SettingsDto {
 	@IsOptional()
@@ -35,4 +35,24 @@ export class SettingsDto {
 	@IsOptional()
 	@IsEnum(UrlStructure)
 	urlStructure?: UrlStructure
+
+	@IsOptional()
+	@IsBoolean()
+	autoRedirect?: boolean
+
+	@IsOptional()
+	@IsBoolean()
+	dynamicTranslation?: boolean
+
+	@IsOptional()
+	@IsBoolean()
+	parseImages?: boolean
+
+	@IsOptional()
+	@IsBoolean()
+	parseVideos?: boolean
+
+	@IsOptional()
+	@IsBoolean()
+	parseDocs?: boolean
 }

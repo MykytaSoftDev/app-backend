@@ -37,6 +37,11 @@ export class SettingsService {
 		return this.prisma.projectSettings.findFirst({
 			select: {
 				id: true,
+				autoRedirect: true,
+				dynamicTranslation: true,
+				parseImages: true,
+				parseVideos: true,
+				parseDocs: true,
 				titleDisplayMode: true,
 				flagDisplayMode: true,
 				widgetDisplayMode: true,

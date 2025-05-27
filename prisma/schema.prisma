@@ -160,16 +160,22 @@ model Language {
 }
 
 model ProjectSettings {
-  id                String            @id @default(cuid())
-  project           Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId         String            @map("project_id")
-  titleDisplayMode  TitleDisplayMode  @default(native) @map("title_display_mode")
-  flagDisplayMode   FlagDisplayMode   @default(circle) @map("flag_display_mode")
-  widgetDisplayMode WidgetDisplayMode @default(dropdown) @map("widget_display_mode")
-  widgetStyle       WidgetStyle       @default(rectangle) @map("widget_style")
-  urlStructure      UrlStructure      @default(default) @map("url_structure")
-  position          Position          @default(rightBottom) @map("position")
-  customPosition    String            @default("") @map("custom_position")
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @map("project_id")
+
+  autoRedirect       Boolean           @default(false) @map("auto_redirect")
+  dynamicTranslation Boolean           @default(true) @map("dynamic_translation")
+  parseImages        Boolean           @default(false) @map("parse_images")
+  parseVideos        Boolean           @default(false) @map("parse_videos")
+  parseDocs          Boolean           @default(false) @map("parse_docs")
+  titleDisplayMode   TitleDisplayMode  @default(native) @map("title_display_mode")
+  flagDisplayMode    FlagDisplayMode   @default(circle) @map("flag_display_mode")
+  widgetDisplayMode  WidgetDisplayMode @default(dropdown) @map("widget_display_mode")
+  widgetStyle        WidgetStyle       @default(rectangle) @map("widget_style")
+  urlStructure       UrlStructure      @default(default) @map("url_structure")
+  position           Position          @default(rightBottom) @map("position")
+  customPosition     String            @default("") @map("custom_position")
 
   @@index([projectId])
   @@map("project_settings")
