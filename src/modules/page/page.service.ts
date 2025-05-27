@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
 import { PageDto } from './page.dto'
 
@@ -7,17 +7,17 @@ export class PageService {
 	constructor(private prisma: PrismaService) {}
 
 	async create(dto: PageDto, userId: string, projectId: string) {
-
 		const userExists = await this.prisma.user.findUnique({
 			where: { id: userId },
 		})
-		if (!userExists) throw new Error(`User with ID ${userId} not found.`)
+		if (!userExists)
+			throw new NotFoundException(`User with ID ${userId} not found.`)
 
 		const projectExists = await this.prisma.project.findUnique({
 			where: { id: projectId },
 		})
 		if (!projectExists)
-			throw new Error(`Project with ID ${projectId} not found.`)
+			throw new NotFoundException(`Project with ID ${projectId} not found.`)
 		return this.prisma.page.create({
 			data: {
 				...dto,

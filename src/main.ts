@@ -10,7 +10,6 @@ async function bootstrap() {
 		type: VersioningType.URI,
 		prefix: 'v',
 	})
-	console.log(app)
 
 	app.setGlobalPrefix('api')
 	app.use(cookieParser())

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { createHash } from 'crypto'
 import { PageService } from 'src/modules/page/page.service'
 import { PrismaService } from 'src/prisma.service'
@@ -58,22 +58,35 @@ export class TranslationService {
 			targetLanguageCode,
 		} = dto
 		const project = await this.projectService.getProjectByProjectKey(projectKey)
-
+		console.log(project)
 		if (!project) return { error: 'Project not found' }
 
-		const pagePath = atob(dto.referrer)
+		const pagePath = atob(referrer)
 
-		let page = await this.pageService.getPageByPath(
+		if (!project.targetLanguages.includes(targetLanguageCode)) {
+			throw new BadRequestException(
+				'This target language does not exist in your languages list.',
+			)
+		}
+		const page = await this.pageService.getPageByPath(
 			project.userId,
 			project.id,
 			pagePath,
 			targetLanguageCode,
 		)
-
 		if (!page) {
-			const result = await this.createTranslation(dto, project.userId, project.id)
+			const result = await this.createTranslation(
+				dto,
+				project.userId,
+				project.id,
+			)
 
-			if (!project.isActivated && result) await this.projectService.update({isActivated: true}, project.id, project.userId)
+			if (!project.isActivated && result)
+				await this.projectService.update(
+					{ isActivated: true },
+					project.id,
+					project.userId,
+				)
 
 			return result
 		}
@@ -91,14 +104,12 @@ export class TranslationService {
 		})
 
 		if (filteredTranslatedSegments.length !== segments.length) {
-			const newTranslations = await this.updateTranslations(
+			return await this.updateTranslations(
 				dto,
 				project.userId,
 				project.id,
 				page.id,
 			)
-
-			return newTranslations
 		}
 
 		return translatedSegments
@@ -170,7 +181,6 @@ export class TranslationService {
 			userId,
 			projectId,
 		)
-
 		// Resulted object
 		const translatedArray = []
 
@@ -178,7 +188,7 @@ export class TranslationService {
 			const textResult = await this.deeplService.translate(
 				dto.segments,
 				dto.sourceLanguageCode,
-				dto.targetLanguageCode
+				dto.targetLanguageCode,
 			)
 
 			for (let i = 0; i < dto.segments.length; i++) {
@@ -191,9 +201,21 @@ export class TranslationService {
 				})
 			}
 		} else {
-			// TODO Finish logic for Google translation
+			for (const segment of dto.segments) {
+				const textResult = await this.googleService.translate(
+					segment,
+					dto.sourceLanguageCode,
+					dto.targetLanguageCode,
+				)
+				translatedArray.push({
+					sourceLanguage: dto.sourceLanguageCode,
+					targetLanguage: dto.targetLanguageCode,
+					sourceText: segment,
+					translatedText: textResult,
+					sourceHash: await this.createSourceHash(segment),
+				})
+			}
 		}
-
 		// Saving...
 		await this.prisma.translation.createMany({
 			data: translatedArray.map(translation => ({
@@ -213,8 +235,8 @@ export class TranslationService {
 
 		return translatedArray.map(translation => ({
 			sourceText: translation.sourceText,
-			translatedText: translation.translatedText
-		}));
+			translatedText: translation.translatedText,
+		}))
 	}
 
 	async updateTranslations(
@@ -300,7 +322,7 @@ export class TranslationService {
 		const translatedArray = []
 
 		if (supportedTranslationService === 'deepl') {
-			let textResult = await this.deeplService.translate(
+			const textResult = await this.deeplService.translate(
 				newSegments.map(segment => segment.text),
 				dto.sourceLanguageCode,
 				dto.targetLanguageCode,
@@ -318,8 +340,22 @@ export class TranslationService {
 				translationMap.set(newSegments[i].hash, textResult[i].text)
 			}
 		} else {
-			// TODO Finish logic for Google translation
-
+			for (const segment of newSegments) {
+				const textResult = await this.googleService.translate(
+					segment.text,
+					dto.sourceLanguageCode,
+					dto.targetLanguageCode,
+				)
+				console.log('updateTranslations, textResult:', textResult)
+				translatedArray.push({
+					sourceLanguage: dto.sourceLanguageCode,
+					targetLanguage: dto.targetLanguageCode,
+					sourceText: segment.text,
+					translatedText: textResult,
+					sourceHash: segment.hash,
+				})
+				translationMap.set(segment.hash, textResult)
+			}
 		}
 
 		// Saving new translations into DB
